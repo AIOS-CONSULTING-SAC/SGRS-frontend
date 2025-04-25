@@ -1,0 +1,7 @@
+<ng-container *ngIf="mostrarListado(); else formulario">
+    <app-listado (registrar)="abrirRegistro()" (editar)="editarUsuario($event)"></app-listado>
+  </ng-container>
+  <ng-template #formulario>
+    <app-registro [usuario]="objetoSeleccionada()" (volver)="volverAlListado()"></app-registro>
+  </ng-template>
+  

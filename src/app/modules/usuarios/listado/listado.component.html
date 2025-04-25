@@ -1,0 +1,88 @@
+<div class="p-4">
+  <h4 class="font-bold text-slate-900 mb-6">Listado de usuarios</h4>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Tipo Usuario</label>
+      <p-dropdown placeholder="Especifique tipo usuario" [options]="[
+            {label: 'Interno', value: '1'},
+            {label: 'Externo', value: '2'}
+          ]" [(ngModel)]="tipoUsuario" class="w-full" />
+    </div>
+    <div *ngIf="tipoUsuario=='2'">
+      <label class="block text-sm font-medium text-slate-700 mb-1">Empresa</label>
+      <p-dropdown placeholder="Especifique empresa" [options]="[
+            {label: 'FortiClient', value: '1'},
+            {label: 'Galaxy Bis', value: '2'}
+          ]" [(ngModel)]="empresa" class="w-full" />
+    </div>
+    <div *ngIf="tipoUsuario=='1'">
+      <label class="block text-sm font-medium text-slate-700 mb-1">Rol</label>
+      <p-dropdown placeholder="Especifique Rol" [autoDisplayFirst]="false" [options]="[
+            {label: 'Administrador' , value:'1'},
+            {label: 'Consulta', value: '2'}
+          ]" [(ngModel)]="rol" class="w-full" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Nro. documento</label>
+      <input pInputText [(ngModel)]="ruc" placeholder="Ingrese Nro. documento" class="w-full" />
+    </div>
+  </div>
+  <div class="grid grid-cols-12 gap-4 mb-6">
+    <div class="col-span-12 md:col-span-8">
+      <label class="block text-sm font-medium text-slate-700 mb-1">Nombres</label>
+      <input pInputText [(ngModel)]="ruc" placeholder="Ingrese nombres" class="w-full" />
+    </div>
+    <div class="col-span-12 md:col-span-4">
+      <label class="block text-sm font-medium text-slate-700 mb-1">Estado</label>
+      <p-dropdown placeholder="Especifique estado" [options]="[
+            {label: 'Activo', value: 'ACTIVO'},
+            {label: 'Inactivo', value: 'INACTIVO'}
+          ]" [(ngModel)]="estado" class="w-full" />
+    </div>
+  </div>
+
+
+  <div class="flex justify-end flex-wrap gap-3 mb-6">
+    <p-button label="Limpiar" severity="secondary" [raised]="true" icon="pi pi-eraser" (onClick)="limpiar()"
+      class="w-full sm:w-auto text-gray-700" [style]="{'min-width': '130px'}" />
+    <button pButton label="Buscar" severity="info" [raised]="true" (onClick)="buscar()" icon="pi pi-search"
+      styleClass=" text-gray-700" class="w-full sm:w-auto text-gray-700" [style]="{'min-width': '130px'}"></button>
+    <p-button label="Registrar" severity="contrast" [raised]="true" (onClick)="registrar.emit()"
+      class="w-full sm:w-auto" icon="pi pi-plus" [style]="{'min-width': '130px'}" />
+  </div>
+
+
+  <p-table [value]="usuarios" [paginator]="true" [rows]="10">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>#</th>
+        <th>Empresa</th>
+        <th>Tipo usuario</th>
+        <th>Rol</th>
+        <th>Nombres</th>
+        <th>Nro. documento</th>
+        <th>Estado</th>
+        <th [width]="120">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-usuario let-i="rowIndex">
+      <tr>
+        <td>{{ i + 1 }}</td>
+        <td>{{ usuario.descEmpresa }}</td>
+        <td>{{ usuario.tipoUsuario }}</td>
+        <td>{{ usuario.rol }}</td>
+        <td>{{ usuario.nombres +' '+ usuario.apellidos }}</td>
+        <td>{{ usuario.nroDocumento }}</td>
+        <td>{{ usuario.estado }}</td>
+        <td>
+          <button pButton icon="pi pi-pencil" (click)="editar.emit(usuario)" severity="contrast"
+            class="p-button-text"></button>
+          <button pButton icon="pi pi-trash" (click)="eliminar(usuario)" class="p-button-text"
+            severity="danger"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-confirmdialog [style]="{'width':'320px'}" />

@@ -1,0 +1,28 @@
+<div class="main-login relative min-h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('assets/Imagen_slaider01.jpg');">
+    <div class="absolute inset-0 bg-blue-900 opacity-50"></div>
+
+    <div class="relative w-full max-w-md p-12 rounded-lg shadow-md bg-white dark:bg-surface-900 z-12">
+        
+      <div class="text-center mb-8">
+        <img src="assets/logo_isoseg.png" alt="Logo" class="mx-auto w-200" />
+      </div>
+  
+      <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Usuario</label>
+      <input pInputText id="email1" type="text" placeholder="Usuario" class="w-full mb-6" [(ngModel)]="email" />
+  
+      <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Contraseña</label>
+      <p-password id="password1" [(ngModel)]="password" placeholder="Contraseña" [toggleMask]="true" styleClass="mb-6" [fluid]="true" [feedback]="false"></p-password>
+  
+      <div class="flex justify-center">
+        <p-button size="large"
+          label="Ingresar"
+          severity="contrast"
+          routerLink="/"
+          [style]="{'width':'100%'}"
+          class="w-[70%]"
+        ></p-button>
+      </div>
+      
+    </div>
+  </div>
+  

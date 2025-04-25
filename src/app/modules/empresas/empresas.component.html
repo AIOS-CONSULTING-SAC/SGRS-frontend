@@ -1,0 +1,7 @@
+<ng-container *ngIf="mostrarListado(); else formulario">
+  <app-listado (registrar)="abrirRegistro()" (editar)="editarEmpresa($event)"></app-listado>
+</ng-container>
+<ng-template #formulario>
+  <app-registro [empresa]="empresaSeleccionada()" (volver)="volverAlListado()"></app-registro>
+</ng-template>
+

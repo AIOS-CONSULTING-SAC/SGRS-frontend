@@ -14,7 +14,7 @@ export class HttpService {
     contentType: string = 'application/json'
   ): Observable<T> {
     const headers = this.createHeaders(contentType)
-
+  
     return this.http.get<T>(endpoint, { headers, params })
   }
 
@@ -66,7 +66,7 @@ export class HttpService {
   private createHeaders(contentType: string): HttpHeaders {
     return new HttpHeaders({
       'Content-Type': contentType,
-      Authorization: 'Bearer ' + localStorage.getItem('token')
+      Authorization: 'Bearer ' + localStorage.getItem('accesstoken')
       // Puedes agregar otros encabezados aquí si es necesario
     })
   }

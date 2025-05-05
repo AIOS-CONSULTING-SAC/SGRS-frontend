@@ -10,3 +10,9 @@ export interface UsuarioResponse {
     estado: 'Activo' | 'Inactivo';
   }
   
+
+  export class IniciarSesionRequest{
+    usuario!: string;
+    password!: string;
+    
+}

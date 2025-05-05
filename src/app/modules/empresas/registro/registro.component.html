@@ -6,6 +6,7 @@
   <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-4">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div>
+        
         <app-form-input [formGroup]="form" controlName="ruc" label="RUC" placeholder="Ingrese RUC" [required]="true"
           [formHelper]="formHelper" [maxLength]="20"></app-form-input>
       </div>

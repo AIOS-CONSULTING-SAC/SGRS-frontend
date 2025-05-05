@@ -14,8 +14,7 @@ import { MensajesToastService } from '../../../shared/mensajes-toast.service';
 @Component({
   selector: 'app-listado',
   imports: [FormsModule, TableModule, DropdownModule, ButtonModule, InputTextModule, ConfirmDialogModule],
-  providers: [ConfirmationService, MensajesToastService
-  ],
+  providers: [ConfirmationService, MensajesToastService],
   templateUrl: './listado.component.html',
   styleUrl: './listado.component.scss'
 })
@@ -44,7 +43,7 @@ export class ListadoComponent {
         return EMPTY;
       }), finalize(() => { this.loading = false })
     ).subscribe((response: ListadoEmpresasResponse) => {
-      const { respuesta, codigo, mensaje } = response;
+      const { respuesta, codigo } = response;
       if (codigo === 0) this.empresas = respuesta
       else this.empresas = []
 
@@ -84,4 +83,5 @@ export class ListadoComponent {
       },
     });
   }
+  
 }

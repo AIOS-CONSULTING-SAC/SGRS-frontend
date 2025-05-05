@@ -30,13 +30,12 @@ export class RegistroComponent {
       ruc: [this.empresa?.ruc || '', Validators.required],
       razonSocial: [this.empresa?.razonSocial || '', Validators.required],
       nombreComercial: [this.empresa?.nombreComercial || '', Validators.required],
-      departamento: [''],
+      departamento: ['', Validators.required],
       provincia: [''],
       distrito: [''],
       direccion: ['', Validators.required],
       idEstado: [''],
     });
-
   
   }
 
@@ -59,17 +58,17 @@ export class RegistroComponent {
       nombreComercial: this.form.get('nombreComercial').value,
       direccion: this.form.get('direccion').value,
       idEstado: this.empresa?.idEstado || 1, 
-      usuarioSesion: 1 // Cambiar según la lógica de tu aplicación
+      usuarioSesion: 1 
     };
   }
 
   guardar() { 
-
+   
     this.empresaService.registrar(this.form.value as GuardarEmpresaRequest).pipe(
       catchError((errorResponse: any) => {
         this.mensajeToast.errorServicioGuardado(errorResponse);
         return EMPTY;
-      }), finalize(() => {  })
+      }), finalize(() => {} )
     ).subscribe((response: ApiResponseCrud) => {
       const { respuesta, codigo, mensaje } = response;
       if(codigo === 0 &&  respuesta =='200') { 

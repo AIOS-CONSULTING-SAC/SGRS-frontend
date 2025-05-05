@@ -1,0 +1,162 @@
+import { Injectable } from '@angular/core'
+import { BehaviorSubject, Observable } from 'rxjs' 
+import { map, tap } from 'rxjs/operators'
+import { HttpClient } from '@angular/common/http' 
+import { HttpService } from '../shared/http.service'
+import { IniciarSesionRequest } from '../models/usuario/usuario.interface'
+import { MensajesToastService } from '../shared/mensajes-toast.service'
+
+const apiServicio = 'api/v1/usuarios/'
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AutenticacionService {
+  private readonly usuarioSesion!: BehaviorSubject<string | null>
+  constructor(
+    private readonly http: HttpService,
+    private readonly httpClient: HttpClient,
+     private mensajeToast: MensajesToastService,
+     
+  ) {
+    this.usuarioSesion = new BehaviorSubject<string | null>(
+      localStorage.getItem('accessToken')
+    )
+  }
+
+  iniciarSesion(request: IniciarSesionRequest): Observable<void> {
+    return this.http.obtenerQueryPost<any>(apiServicio + 'login', request).pipe(
+      map((response: any) => {
+        if (response.codigo === 200) {
+          const { accessToken, refreshToken } = response.respuesta;
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+          this.usuarioSesion.next(accessToken);
+        } else {
+          throw new Error(response.mensaje);
+        }
+      })
+    );
+  }
+  
+  
+  refreshToken(): Observable<string> {
+    const requestRefresh = {} as any
+    requestRefresh.token = this.obtenerRefreshToken()
+    return this.httpClient.post<any>(apiServicio + 'refreshToken', requestRefresh).pipe(
+      tap((response) => {
+        localStorage.setItem('accessToken', response.data.token)
+        localStorage.setItem('refreshToken', response.data.refreshToken) 
+      }),
+      map(response => response.data)
+    )
+  }
+
+  public get usuarioLogeado(): any | null {
+    return this.usuarioSesion.value
+  }
+
+  logout(): void {
+    if (this.estaAutenticado()) {
+      localStorage.clear()
+      this.usuarioSesion.next(null)
+    }
+   
+  }
+
+  obtenerToken(): string | null {
+    return localStorage.getItem('accessToken')
+  }
+
+  obtenerRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken')
+  } 
+
+  estaAutenticado(): boolean {
+    const token = this.obtenerToken()
+    if (!token) {
+      return false // No hay token
+    }
+
+    // Decodificar el token para obtener la fecha de expiración
+    const tokenPayload = JSON.parse(atob(token.split('.')[1]))
+    const expirationDate = new Date(tokenPayload.exp * 1000) // Multiplicar por 1000 para convertir segundos a milisegundos
+
+    // Verificar si el token ha expirado
+    const ahora = new Date()
+    return expirationDate > ahora
+  }
+
+  private decodeToken(): TokenPayload | null {
+    const token = this.obtenerToken()
+    if (token) {
+      try {
+        const base64Url = token.split('.')[1]
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        }).join(''))
+        return JSON.parse(jsonPayload)
+      } catch (error) {
+        console.error('Error decoding JWT', error)
+        return null
+      }
+    }
+    return null
+  }
+
+  obtenerNombresApe(): string {
+    const tokenPayload = this.decodeToken()
+    if (tokenPayload) {
+      return `${tokenPayload.nombres} ${tokenPayload.apellidos}`
+    }
+    return ''
+  }
+
+  obtenerCodUsuario(): number | null {
+    const tokenPayload = this.decodeToken()
+    if (tokenPayload) {
+      return tokenPayload.codigoUsuario
+    }
+    return null
+  }
+
+  obtenerCodEmpresa(): number | null {
+    const tokenPayload = this.decodeToken()
+    if (tokenPayload) {
+      return tokenPayload.codigoEmpresa
+    }
+    return null
+  }
+
+  obtenerCodPerfil(): number | null {
+    const tokenPayload = this.decodeToken()
+    if (tokenPayload) {
+      return tokenPayload.codigoRol
+    }
+    return null
+  }
+
+  getDatosToken() {
+    const token = localStorage.getItem('accessToken')
+
+    if (!token) return null
+
+    try {
+      return JSON.parse(atob(token.split('.')[1])) as TokenPayload
+    } catch (error) {
+      return null
+    }
+  }
+
+  
+}
+
+type TokenPayload = {
+  codigoRol: number
+  codigoEmpresa: number
+  codigoUsuario: number
+  tipoUsuario: string
+  nombres: string
+  apellidos: string
+}

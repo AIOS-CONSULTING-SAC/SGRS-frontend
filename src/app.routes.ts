@@ -7,6 +7,7 @@ import { Notfound } from './app/pages/notfound/notfound';
 import { LoginComponent } from './app/login/login.component';
 import { EmpresasComponent } from './app/modules/empresas/empresas.component';
 import { UsuariosComponent } from './app/modules/usuarios/usuarios.component';
+import { AuthGuard } from './app/auth/auth.guard';
 
 export const appRoutes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -14,7 +15,7 @@ export const appRoutes: Routes = [
     {
         path: '',
         component: AppLayout,
-        //canActivate: [AuthGuard],
+        canActivate: [AuthGuard],
         children: [
             { path: 'dashboard', component: Dashboard },
             { path: 'empresa', component:EmpresasComponent },

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
 import { EmpresaTO, ListadoEmpresasResponse } from '../../../models/empresa/empresa.interface';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -10,6 +10,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { EmpresaService } from '../../../service/empresa.service';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { MensajesToastService } from '../../../shared/mensajes-toast.service';
+import { ActivatedRoute, Data } from '@angular/router';
 
 @Component({
   selector: 'app-listado',
@@ -18,20 +19,27 @@ import { MensajesToastService } from '../../../shared/mensajes-toast.service';
   templateUrl: './listado.component.html',
   styleUrl: './listado.component.scss'
 })
-export class ListadoComponent {
+export class ListadoComponent implements OnInit {
   empresas: EmpresaTO[] = [];
   loading = false;
   razonSocial = '';
   ruc = '';
   estado:number | null = null;
-
+  tituloComponente!: string;
   @Output() registrar = new EventEmitter();
   @Output() editar = new EventEmitter<EmpresaTO>();
-
+  @Output() configuracion = new EventEmitter<EmpresaTO>(); 
   constructor(private confirmationService: ConfirmationService, 
     private mensajeService: MensajesToastService,
+    private readonly route: ActivatedRoute,
     private empresaService: EmpresaService) {
     this.buscar();
+  }
+
+  ngOnInit(){
+    this.route.data.subscribe((data: Data) => {
+      this.tituloComponente = data['breadcrumb']
+    })
   }
 
   buscar() {

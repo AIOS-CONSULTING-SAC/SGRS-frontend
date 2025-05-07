@@ -1,5 +1,5 @@
 <div class="p-4">
-  <h3 class="font-bold text-slate-900 mb-6">Listado de empresas</h3>
+  <h3 class="text-lg font-semibold text-slate-900 mb-4">{{tituloComponente}}</h3>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div>
       <label class="block text-sm font-medium text-slate-700 mb-1">Razón social</label>
@@ -36,7 +36,7 @@
         <th>Razón social</th>
         <th>Nombre comercial</th>
         <th>Estado</th>
-        <th [width]="120">Acciones</th>
+        <th [width]="150">Acciones</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-empresa let-i="rowIndex">
@@ -47,14 +47,15 @@
         <td>{{ empresa.nombreComercial }}</td>
         <td>{{ empresa.descEstado }}</td>
         <td>
-          <button pButton icon="pi pi-pencil" (click)="editar.emit(empresa)" severity="contrast"
+          <button pButton icon="pi pi-pencil" size="small" (click)="editar.emit(empresa)" severity="contrast"
             class="p-button-text"></button>
-          <button pButton icon="pi pi-trash" (click)="eliminar(empresa)" class="p-button-text"
+            <button pButton icon="pi pi-cog" size="small" (click)="configuracion.emit(empresa)" severity="contrast"
+            class="p-button-text"></button>
+          <button pButton icon="pi pi-trash" size="small" (click)="eliminar(empresa)" class="p-button-text"
             severity="danger"></button>
         </td>
       </tr>
     </ng-template>
   </p-table>
-</div>
-
-<p-confirmdialog [style]="{'width':'320px'}" />
+</div> 
+<p-confirmdialog [style]="{'width':'420px'}" />

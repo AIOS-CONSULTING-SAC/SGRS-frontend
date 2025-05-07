@@ -1,0 +1,20 @@
+<p-dialog [visible]="visible" [header]="titulo" [modal]="true" [closable]="false" [style]="{'width':'620px'}">
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-4">
+        <div>
+            <app-form-input [formGroup]="form" controlName="nombre" label="Nombre" placeholder="Ingrese nombre"
+                [required]="true" [formHelper]="formHelper" [maxLength]="100"></app-form-input>
+        </div>
+        <div>
+            <app-form-input [formGroup]="form" controlName="direccion" label="Dirección" placeholder="Ingrese Dirección"
+                [required]="true" [formHelper]="formHelper" [maxLength]="100"></app-form-input>
+        </div>
+
+        <div class="flex justify-end flex-wrap gap-3 mb-6">
+            <button pButton label="Cancelar" type="button" [raised]="true"  severity="secondary" class="min-w-[130px]"></button>
+            <button pButton label="Guardar" type="submit" icon="pi pi-save" [raised]="true" severity="contrast"
+                class="min-w-[130px]"></button>
+            
+        </div>
+    </form>
+ 
+</p-dialog>

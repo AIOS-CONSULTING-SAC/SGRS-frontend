@@ -18,8 +18,8 @@ export const appRoutes: Routes = [
         canActivate: [AuthGuard],
         children: [
             { path: 'dashboard', component: Dashboard },
-            { path: 'empresa', component:EmpresasComponent },
-            { path: 'usuario', component: UsuariosComponent },
+            { path: 'empresa', data: { breadcrumb: 'Mantenimiento > Empresas' }, component:EmpresasComponent},
+            { path: 'usuario', data: { breadcrumb: 'Mantenimiento > Usuarios' }, component: UsuariosComponent },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },

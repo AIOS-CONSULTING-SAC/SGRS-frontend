@@ -1,7 +1,23 @@
-<ng-container *ngIf="mostrarListado(); else formulario">
-  <app-listado (registrar)="abrirRegistro()" (editar)="editarEmpresa($event)"></app-listado>
+<ng-container *ngIf="mostrarListado(); else modoAlternativo">
+  <app-listado
+    (registrar)="abrirRegistro()"
+    (configuracion)="configurarEmpresa($event)"
+    (editar)="editarEmpresa($event)">
+  </app-listado>
 </ng-container>
-<ng-template #formulario>
-  <app-registro [empresa]="empresaSeleccionada()" (volver)="volverAlListado()"></app-registro>
-</ng-template>
 
+<ng-template #modoAlternativo> 
+  <ng-container *ngIf="estaConfigurando; else mostrarFormulario">
+    <app-configurar
+      [empresa]="mostrarConfigurar()"
+      (volver)="volverAlListado()">
+    </app-configurar>
+  </ng-container>
+ 
+  <ng-template #mostrarFormulario>
+    <app-registro
+      [empresa]="empresaSeleccionada()"
+      (volver)="volverAlListado()">
+    </app-registro>
+  </ng-template>
+</ng-template>

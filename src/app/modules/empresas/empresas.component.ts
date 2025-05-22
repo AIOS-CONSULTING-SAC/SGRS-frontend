@@ -4,6 +4,7 @@ import { RegistroComponent } from './registro/registro.component';
 import { CommonModule } from '@angular/common'; 
 import { EmpresaTO } from '../../models/empresa/empresa.interface';
 import { ConfigurarComponent } from './configurar/configurar.component';
+import { ClienteResponse } from '../../models/cliente/cliente.interface';
 
 @Component({
   selector: 'app-empresas',
@@ -13,8 +14,8 @@ import { ConfigurarComponent } from './configurar/configurar.component';
 })
 export class EmpresasComponent implements OnInit {
   private mostrarListadoSignal = signal(true);
-  private empresaSignal = signal<EmpresaTO | null>(null);
-  private configurarSignal = signal<EmpresaTO | null>(null);
+  private empresaSignal = signal<ClienteResponse | null>(null);
+  private configurarSignal = signal<ClienteResponse | null>(null);
   
   mostrarConfigurar= this.configurarSignal.asReadonly()
   mostrarListado = this.mostrarListadoSignal.asReadonly();
@@ -28,13 +29,13 @@ export class EmpresasComponent implements OnInit {
     this.configurarSignal.set(null);
   }
 
-  editarEmpresa(empresa: EmpresaTO) {
+  editarEmpresa(empresa: ClienteResponse) {
     this.empresaSignal.set(empresa);
     this.configurarSignal.set(null);
     this.mostrarListadoSignal.set(false);
   }
 
-  configurarEmpresa(empresa: EmpresaTO) {
+  configurarEmpresa(empresa: ClienteResponse) {
     this.empresaSignal.set(null);
     this.configurarSignal.set(empresa);
     this.mostrarListadoSignal.set(false);

@@ -11,6 +11,9 @@ import { EmpresaService } from '../../../service/empresa.service';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { MensajesToastService } from '../../../shared/mensajes-toast.service';
 import { ActivatedRoute, Data } from '@angular/router';
+import { ClienteService } from '../../../service/cliente.service';
+import { AutenticacionService } from '../../../auth/autenticacion.service';
+import { ClienteResponse, ListadoClientesResponse } from '../../../models/cliente/cliente.interface';
 
 @Component({
   selector: 'app-listado',
@@ -20,19 +23,20 @@ import { ActivatedRoute, Data } from '@angular/router';
   styleUrl: './listado.component.scss'
 })
 export class ListadoComponent implements OnInit {
-  empresas: EmpresaTO[] = [];
+  empresas: ClienteResponse[] = [];
   loading = false;
   razonSocial = '';
   ruc = '';
   estado:number | null = null;
   tituloComponente!: string;
   @Output() registrar = new EventEmitter();
-  @Output() editar = new EventEmitter<EmpresaTO>();
-  @Output() configuracion = new EventEmitter<EmpresaTO>(); 
+  @Output() editar = new EventEmitter<ClienteResponse>();
+  @Output() configuracion = new EventEmitter<ClienteResponse>(); 
   constructor(private confirmationService: ConfirmationService, 
     private mensajeService: MensajesToastService,
     private readonly route: ActivatedRoute,
-    private empresaService: EmpresaService) {
+    private clienteService: ClienteService,
+  private autenticacionService: AutenticacionService) {
     this.buscar();
   }
 
@@ -43,14 +47,15 @@ export class ListadoComponent implements OnInit {
   }
 
   buscar() {
+    console.log(this.autenticacionService.getDatosToken())
     this.loading = true;
-    this.empresaService.listado(  this.ruc,this.razonSocial, this.estado ).pipe(
+    this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, this.ruc, this.razonSocial, this.estado).pipe(
       catchError((errorResponse: any) => {
         this.mensajeService.errorServicioConsulta(errorResponse);
 
         return EMPTY;
       }), finalize(() => { this.loading = false })
-    ).subscribe((response: ListadoEmpresasResponse) => {
+    ).subscribe((response: ListadoClientesResponse) => {
       const { respuesta, codigo } = response;
       if (codigo === 0) this.empresas = respuesta
       else this.empresas = []

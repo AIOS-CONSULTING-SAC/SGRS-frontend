@@ -10,6 +10,7 @@ import { TabsModule } from 'primeng/tabs';
 import { RouterModule } from '@angular/router';
 import { LocalesComponent } from './locales/locales.component'; 
 import { ResiduosComponent } from './residuos/residuos.component';
+import { ClienteResponse } from '../../../models/cliente/cliente.interface';
 
 @Component({
   selector: 'app-configurar',
@@ -19,7 +20,7 @@ import { ResiduosComponent } from './residuos/residuos.component';
   styleUrl: './configurar.component.scss'
 })
 export class ConfigurarComponent {
-  @Input() empresa: EmpresaTO | null = null;
+  @Input() cliente: ClienteResponse | null = null;
   @Output() volver = new EventEmitter();
   tabs = [
     { label: 'Locales', icon: 'pi pi-home' },

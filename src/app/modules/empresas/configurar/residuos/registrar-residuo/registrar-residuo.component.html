@@ -1,1 +1,32 @@
-<p>registrar-residuo works!</p>
+<p-dialog [visible]="visible()" [header]="titulo()" [modal]="true" [closable]="false" [style]="{ width: '620px' }">
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-4">
+    <div>
+      <app-form-input [formGroup]="form" controlName="descripcion" label="Descripción" placeholder="Ingrese descripción"
+        [required]="true" [maxLength]="100"></app-form-input>
+
+    </div>
+
+    <div>
+      <p-dropdown formControlName="idUnidad" label="Unidad" appendTo="body" placeholder="Seleccione unidad" [options]="[
+        { label: 'Kg', value: 1 },
+        { label: 'L', value: 2 }
+      ]"></p-dropdown>
+
+    </div>
+    <div>
+      <p-dropdown formControlName="idEstado" label="Estado" placeholder="Seleccione estado" [required]="true"  *ngIf="form.get('residuo')?.value"
+        appendTo="body" [options]="[
+        { label: 'Activo', value: 1 },
+        { label: 'Inactivo', value: 0 }
+      ]"></p-dropdown>
+    </div>
+
+    <div class="flex justify-end flex-wrap gap-3">
+      <button pButton type="button" label="Cancelar" (click)="cancelar()" severity="secondary" [raised]="true"
+        class="min-w-[130px]"></button>
+      <button pButton type="submit" icon="pi pi-save" label="Guardar" [raised]="true" severity="contrast"
+        class="min-w-[130px]"></button>
+    </div>
+
+  </form>
+</p-dialog>

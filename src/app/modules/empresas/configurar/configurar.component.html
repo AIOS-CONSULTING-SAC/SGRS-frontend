@@ -1,8 +1,11 @@
 <div class="p-4">
-    <h3 class="text-lg font-semibold text-slate-900 mb-4">Mantenimiento > Empresas > {{empresa?.nombreComercial}}</h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <button pButton label="Ir atrás" type="button" (click)="volver.emit()" [raised]="true" icon="pi pi-arrow-left"
-            severity="secondary" class="min-w-[130px]"></button>
+    <div class="flex items-center justify-between gap-4  mb-6">
+        <div class="text-lg font-semibold text-slate-900 mb-4">Mantenimiento > Empresas > {{cliente?.nombreComercial}}</div>
+        <div>
+            <button pButton type="button" icon="pi pi-arrow-left"  severity="info" (click)="volver.emit()" [raised]="true"
+            class="p-button-text p-button-plain" ></button>
+           
+        </div>
     </div>
 
     <p-tabs value="0">
@@ -12,14 +15,14 @@
         </p-tablist>
         <p-tabpanels>
             <p-tabpanel value="0">
-                <p class="m-0">
-                    <app-locales></app-locales>
-                </p>
+                <div class="m-0 w-full">
+                    <app-locales [cliente]="cliente"></app-locales>
+                </div>
             </p-tabpanel>
             <p-tabpanel value="1">
-                <p class="m-0">
-                    <app-residuos></app-residuos>
-                </p>
+                <div class="m-0 w-full">
+                    <app-residuos [cliente]="cliente"></app-residuos>
+                </div>
             </p-tabpanel>
         </p-tabpanels>
     </p-tabs>

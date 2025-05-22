@@ -4,21 +4,23 @@ import { environment } from '../../enviroments/environment';
 import { EmpresaTO, GuardarEmpresaRequest, ListadoEmpresasResponse } from '../models/empresa/empresa.interface';
 import { Observable } from 'rxjs';
 import { ApiResponse, ApiResponseCrud } from '../models/respuesta';
+import { ClienteResponse, ListadoClientesResponse } from '../models/cliente/cliente.interface';
 
- const apiServicio = 'api/v1/empresas/'
+ const apiServicio = 'api/v1/clientes/'
 @Injectable({
   providedIn: 'root'
 })
-export class EmpresaService { 
+export class ClienteService { 
   constructor(private http: HttpService) { 
   }
 
-  listado(ruc?: string, razonSocial?: string, idEstado?: number | null): Observable<ApiResponse<EmpresaTO[]>> {
+  listado(idEmpresa?: number | null, ruc?: string, razonSocial?: string, idEstado?: number | null): Observable<ApiResponse<ClienteResponse[]>> {
     let url =apiServicio + `listar?`
+    if (idEmpresa) url += `idEmpresa=${idEmpresa}`
     if (ruc) url += `ruc=${ruc}`
     if (razonSocial) url += `&razonSocial=${razonSocial}`
     if (idEstado) url += `&idEstado=${idEstado}`
-    return this.http.obtenerQueryGet<ListadoEmpresasResponse>(url)
+    return this.http.obtenerQueryGet<ListadoClientesResponse>(url)
   }
  
   actualizar(request: GuardarEmpresaRequest) {

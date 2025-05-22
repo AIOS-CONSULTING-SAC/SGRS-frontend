@@ -9,7 +9,7 @@
 <ng-template #modoAlternativo> 
   <ng-container *ngIf="estaConfigurando; else mostrarFormulario">
     <app-configurar
-      [empresa]="mostrarConfigurar()"
+      [cliente]="mostrarConfigurar()"
       (volver)="volverAlListado()">
     </app-configurar>
   </ng-container>

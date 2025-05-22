@@ -1,14 +1,11 @@
 <div class="p-4">
-
-    <div class="grid gap-4 mb-6">
-        <div class="grid grid-cols-12 gap-4 mb-4">
-            <!-- Nombre -->
+    <div class=""> 
+        <div class="grid grid-cols-12 gap-4 mb-4"> 
             <div class="col-span-12 md:col-span-8">
                 <label class="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
                 <input pInputText [(ngModel)]="nombre" placeholder="Ingrese nombre" class="w-full" />
             </div>
-
-            <!-- Estado -->
+ 
             <div class="col-span-12 md:col-span-4">
                 <label class="block text-sm font-medium text-slate-700 mb-1">Estado</label>
                 <p-dropdown placeholder="Especifique estado" [options]="[
@@ -42,12 +39,13 @@
             <ng-template pTemplate="body" let-empresa let-i="rowIndex">
                 <tr>
                     <td>{{ i + 1 }}</td>
-                    <td>{{ empresa.ruc }}</td> 
+                    <td>{{ empresa.nombre }}</td> 
+                    <td>{{ empresa.direccion }}</td>
                     <td>{{ empresa.descEstado }}</td>
                     <td>
-                        <button pButton icon="pi pi-pencil" size="small" 
+                        <button pButton icon="pi pi-pencil" size="small" (click)="editar(empresa)"
                             severity="contrast" class="p-button-text"></button>
-                        <button pButton icon="pi pi-trash" size="small" (click)="eliminar(empresa)"
+                        <button pButton icon="pi pi-trash" size="small" *ngIf="empresa.idEstado==1" (click)="eliminar(empresa)"
                             class="p-button-text" severity="danger"></button>
                     </td>
                 </tr>
@@ -56,5 +54,5 @@
     </div>
 
 </div>
-<app-registrar-local #registrarLocal></app-registrar-local>
+<app-registrar-local #registrarLocal [cliente]="cliente" (guardado)="guardar($event)"></app-registrar-local>
 <p-confirmdialog [style]="{'width':'420px'}" />

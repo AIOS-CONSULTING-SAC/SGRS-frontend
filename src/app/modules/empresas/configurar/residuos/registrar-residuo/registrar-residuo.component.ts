@@ -1,11 +1,101 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { ClienteResponse } from '../../../../../models/cliente/cliente.interface';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormHelper } from '../../../../../shared/form.helper';
+import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
+import { FormInputComponent } from '../../../../../shared/components/form-input.component';
+import { DropdownModule } from 'primeng/dropdown';
+import { CommonModule } from '@angular/common';
+import { ResiduoService } from '../../../../../service/residuo.service';
+
+import { catchError, EMPTY, finalize } from 'rxjs';
+import { MensajesToastService } from '../../../../../shared/mensajes-toast.service';
+import { GuardarResiduoRequest } from '../../../../../models/residuo/residuo.interface';
+import { AutenticacionService } from '../../../../../auth/autenticacion.service';
+import { ApiResponseCrud } from '../../../../../models/respuesta';
 
 @Component({
   selector: 'app-registrar-residuo',
-  imports: [],
   templateUrl: './registrar-residuo.component.html',
-  styleUrl: './registrar-residuo.component.scss'
+  standalone: true,
+  imports: [ReactiveFormsModule, DialogModule, ButtonModule, CommonModule,
+    FormInputComponent, DropdownModule, FormsModule],
 })
-export class RegistrarResiduoComponent {
+export class RegistrarResiduoComponent implements OnInit {
+  @Output() actualizado = new EventEmitter<void>();
 
+  visible = signal(false);
+  titulo = signal('Registrar residuo');
+  form: FormGroup | any;
+  formHelper !: any;
+
+  loading = signal(false);
+  @Output() guardado = new EventEmitter<string>();
+  @Input() cliente!: ClienteResponse;
+  constructor(
+    private fb: FormBuilder,
+    private residuosService: ResiduoService,
+    private mensajeService: MensajesToastService,
+
+    private autenticacionService: AutenticacionService
+  ) {
+    this.form = this.fb.group({
+      residuo: [null],
+      codCliente: [this.cliente?.cliente],
+      descripcion: ['', [Validators.required, Validators.maxLength(100)]],
+      idUnidad: [null, Validators.required],
+      idEstado: [1, Validators.required],
+      usuarioSesion: [this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? ''],
+    });
+  }
+
+  ngOnInit(): void {
+    this.formHelper = new FormHelper(this.form);
+
+  }
+  abrir(titulo: string, data?: any) {
+    this.titulo.set(titulo);
+    if (data) this.form.patchValue(data);
+    this.visible.set(true);
+  }
+
+  cerrar() {
+    this.form.reset({ idEstado: 1 });
+    this.visible.set(false);
+  }
+
+  guardar() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const formValue: GuardarResiduoRequest = this.form.getRawValue();
+    formValue.usuarioSesion = this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0;
+    const peticion = formValue.residuo
+      ? this.residuosService.actualizar(formValue)
+      : this.residuosService.registrar(formValue);
+
+    this.loading.set(true);
+    peticion.pipe(
+      catchError((errorResponse: any) => {
+        this.mensajeService.errorServicioGuardado(errorResponse);
+        return EMPTY;
+      }), finalize(() => { this.loading.set(false); })
+    ).subscribe((response: ApiResponseCrud) => {
+      const { respuesta, codigo, mensaje } = response;
+      if (codigo === 0 && respuesta == '200') {
+        this.guardado.emit(mensaje);
+        this.form.reset();
+        this.visible.set(false);
+      } else {
+        this.mensajeService.error('Error', mensaje);
+      }
+    });
+  }
+
+  cancelar() {
+    this.cerrar();
+  }
 }

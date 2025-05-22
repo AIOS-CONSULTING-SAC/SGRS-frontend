@@ -8,13 +8,22 @@
             <app-form-input [formGroup]="form" controlName="direccion" label="Dirección" placeholder="Ingrese Dirección"
                 [required]="true" [formHelper]="formHelper" [maxLength]="100"></app-form-input>
         </div>
-
+        <div *ngIf="form.get('local')?.value">
+              <label class="block text-sm font-medium text-slate-700 mb-1">Estado <small class="p-error">*</small></label>
+            <p-dropdown placeholder="Especifique estado"   [appendTo]="'body'"
+            [options]="[
+                  {label: 'Activo', value: 1},
+                  {label: 'Inactivo', value: 0}
+                ]" formControlName="idEstado" class="w-full"></p-dropdown>
+        </div>
         <div class="flex justify-end flex-wrap gap-3 mb-6">
-            <button pButton label="Cancelar" type="button" [raised]="true"  severity="secondary" class="min-w-[130px]"></button>
+            <button pButton label="Cancelar" type="button" [raised]="true" (click)="cancelar()" severity="secondary"
+                class="min-w-[130px]"></button>
             <button pButton label="Guardar" type="submit" icon="pi pi-save" [raised]="true" severity="contrast"
                 class="min-w-[130px]"></button>
-            
+
         </div>
     </form>
- 
+
 </p-dialog>
+<app-loading [show]="loading"></app-loading>

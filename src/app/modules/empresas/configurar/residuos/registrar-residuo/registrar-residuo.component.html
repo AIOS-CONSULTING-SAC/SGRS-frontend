@@ -6,19 +6,25 @@
 
     </div>
 
-    <div>
-      <p-dropdown formControlName="idUnidad" label="Unidad" appendTo="body" placeholder="Seleccione unidad" [options]="[
-        { label: 'Kg', value: 1 },
-        { label: 'L', value: 2 }
-      ]"></p-dropdown>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Unidad</label>
+        <p-dropdown formControlName="idUnidad" label="Unidad" appendTo="body" placeholder="Seleccione unidad" [options]="[
+          { label: 'Kg', value: 1 },
+          { label: 'L', value: 2 }
+        ]" class="w-full">
+        </p-dropdown>
+      </div>
 
-    </div>
-    <div>
-      <p-dropdown formControlName="idEstado" label="Estado" placeholder="Seleccione estado" [required]="true"  *ngIf="form.get('residuo')?.value"
-        appendTo="body" [options]="[
-        { label: 'Activo', value: 1 },
-        { label: 'Inactivo', value: 0 }
-      ]"></p-dropdown>
+      <div *ngIf="form.get('residuo')?.value">
+        <label class="block text-sm font-medium text-slate-700 mb-1">Estado</label>
+        <p-dropdown formControlName="idEstado" label="Estado" placeholder="Seleccione estado"
+          appendTo="body" [options]="[
+          { label: 'Activo', value: 1 },
+          { label: 'Inactivo', value: 0 }
+        ]" class="w-full">
+        </p-dropdown>
+      </div>
     </div>
 
     <div class="flex justify-end flex-wrap gap-3">

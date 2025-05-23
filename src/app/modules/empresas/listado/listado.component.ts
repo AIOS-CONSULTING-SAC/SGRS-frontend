@@ -14,10 +14,11 @@ import { ActivatedRoute, Data } from '@angular/router';
 import { ClienteService } from '../../../service/cliente.service';
 import { AutenticacionService } from '../../../auth/autenticacion.service';
 import { ClienteResponse, ListadoClientesResponse } from '../../../models/cliente/cliente.interface';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-listado',
-  imports: [FormsModule, TableModule, DropdownModule, ButtonModule, InputTextModule, ConfirmDialogModule],
+  imports: [FormsModule, TableModule, DropdownModule, ButtonModule, InputTextModule, CommonModule, ConfirmDialogModule],
   providers: [ConfirmationService, MensajesToastService],
   templateUrl: './listado.component.html',
   styleUrl: './listado.component.scss'
@@ -46,8 +47,7 @@ export class ListadoComponent implements OnInit {
     })
   }
 
-  buscar() {
-    console.log(this.autenticacionService.getDatosToken())
+  buscar() { 
     this.loading = true;
     this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, this.ruc, this.razonSocial, this.estado).pipe(
       catchError((errorResponse: any) => {
@@ -71,11 +71,11 @@ export class ListadoComponent implements OnInit {
     this.buscar();
   }
 
-  eliminar(empresa: EmpresaTO) {
-    console.log(empresa);
+  eliminar(cliente: ClienteResponse) {
+    console.log(cliente);
     this.confirmationService.confirm({
 
-      message: '¿Está seguro que desea desactivar la empresa <b>' + empresa.razonSocial + '</b> ? <br /><br />Podrá reactivar en cualquier momento.',
+      message: '¿Está seguro que desea desactivar la empresa <b>' + cliente.razonSocial + '</b> ? <br /><br />Podrá reactivar en cualquier momento.',
       header: 'Eliminar empresa',
       rejectLabel: 'Cancelar',
       rejectButtonProps: {
@@ -89,11 +89,21 @@ export class ListadoComponent implements OnInit {
       },
 
       accept: () => {
-        //this.messageService.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted' });
-      },
-      reject: () => {
-        //this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected' });
-      },
+         this.clienteService
+          .eliminar(cliente.cliente, this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0,
+          this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0)
+          .pipe(finalize(() => this.buscar()))
+          .subscribe({
+            next: (res) => {
+              if (res.codigo === 0) {
+                this.mensajeService.exito('Éxito','Se desactivó la empresa correctamente');
+              } else {
+                this.mensajeService.error('Error',res.mensaje || 'Error al eliminar');
+              }
+            },
+            error: (err) => this.mensajeService.errorServicioGuardado(err)
+          });
+      }, 
     });
   }
   

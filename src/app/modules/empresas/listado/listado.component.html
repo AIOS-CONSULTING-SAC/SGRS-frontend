@@ -49,13 +49,13 @@
         <td>
           <button pButton icon="pi pi-pencil" size="small" (click)="editar.emit(empresa)" severity="contrast"
             class="p-button-text"></button>
-            <button pButton icon="pi pi-cog" size="small" (click)="configuracion.emit(empresa)" severity="contrast"
+          <button pButton icon="pi pi-cog" size="small" (click)="configuracion.emit(empresa)" severity="contrast"
             class="p-button-text"></button>
-          <button pButton icon="pi pi-trash" size="small" (click)="eliminar(empresa)" class="p-button-text"
-            severity="danger"></button>
+          <button pButton icon="pi pi-trash" size="small"  *ngIf="empresa.idEstado==1" (click)="eliminar(empresa)"
+            class="p-button-text" severity="danger"></button>
         </td>
       </tr>
     </ng-template>
   </p-table>
-</div> 
+</div>
 <p-confirmdialog [style]="{'width':'420px'}" />

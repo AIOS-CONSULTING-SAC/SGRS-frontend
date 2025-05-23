@@ -56,7 +56,7 @@ export class RegistrarLocalComponent implements OnInit {
       const request: GuardarLocalRequest = {
         local: this.form.get('local').value ?? null,
         codCliente: this.cliente.cliente,
-        usuarioSesion: this.form.get('usuarioSesion').value,
+        usuarioSesion: this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? '',
         nombre: this.form.get('nombre').value,
         direccion: this.form.get('direccion').value,
         idEstado: this.form.get('idEstado').value,

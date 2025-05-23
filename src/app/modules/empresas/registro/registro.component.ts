@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { EmpresaTO, GuardarEmpresaRequest } from '../../../models/empresa/empresa.interface';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
@@ -11,68 +11,173 @@ import { EmpresaService } from '../../../service/empresa.service';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { MensajesToastService } from '../../../shared/mensajes-toast.service';
 import { ApiResponse, ApiResponseCrud } from '../../../models/respuesta';
+import { ParametroService } from '../../../service/parametro.service';
+import { ParametroResponse } from '../../../models/parametro/parametro.interface';
+import { ClienteService } from '../../../service/cliente.service';
+import { ClienteResponse, GuardarClienteRequest } from '../../../models/cliente/cliente.interface';
+import { AutenticacionService } from '../../../auth/autenticacion.service';
+import { LoadingComponent } from '../../../shared/loading/loading.component';
 
 @Component({
   selector: 'app-registro',
-  imports: [DropdownModule, FormsModule,ReactiveFormsModule, CommonModule, InputTextModule, ButtonModule, FormInputComponent],
+  imports: [DropdownModule, FormsModule, LoadingComponent, ReactiveFormsModule, CommonModule, InputTextModule, ButtonModule, FormInputComponent],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.scss'
 })
 export class RegistroComponent {
-  @Input() empresa: EmpresaTO | null = null;
+  @Input() cliente!: ClienteResponse;
   @Output() volver = new EventEmitter();
-  form:  FormGroup | any;
+  form: FormGroup | any;
   formHelper !: any;
+  departamentos: ParametroResponse[] = [];
+  provincias: ParametroResponse[] = [];
+  distritos: ParametroResponse[] = [];
+  loading: boolean = false
   constructor(private fb: FormBuilder,
     private mensajeToast: MensajesToastService,
-    private empresaService: EmpresaService ) {
+    private parametroService: ParametroService,
+    private autenticacionService: AutenticacionService,
+    private clienteService: ClienteService) {
+
     this.form = this.fb.group({
-      ruc: [this.empresa?.ruc || '', Validators.required],
-      razonSocial: [this.empresa?.razonSocial || '', Validators.required],
-      nombreComercial: [this.empresa?.nombreComercial || '', Validators.required],
-      departamento: ['', Validators.required],
-      provincia: [''],
-      distrito: [''],
+      codEmpresa: [this.cliente?.codEmpresa || '', Validators.required],
+      cliente: [this.cliente?.cliente || '', Validators.required],
+      ruc: [this.cliente?.ruc || '', Validators.required],
+      razonSocial: [this.cliente?.razonSocial || '', Validators.required],
+      nombreComercial: [this.cliente?.nombreComercial || '', Validators.required],
+      idDepartamento: ['', Validators.required],
+      idProvincia: ['', Validators.required],
+      idDistrito: ['', Validators.required],
       direccion: ['', Validators.required],
       idEstado: [''],
+      usuarioSesion: [this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? ''],
     });
-  
+
   }
 
-  ngOnInit() { 
+  ngOnInit() {
     this.formHelper = new FormHelper(this.form);
-    
-    if (this.empresa) {
-      this.form.patchValue(this.empresa);
-      
-        this.form.get('ruc').disable();
-     
+
+    if (this.cliente) {
+
+      this.form.get('ruc').disable();
+    }
+    this.cargarDepartamentos();
+
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.form.patchValue(changes['cliente'].currentValue);
+    let idDepartamento = changes['cliente'].currentValue?.idDepartamento;
+
+    if (idDepartamento) {
+      this.cargarProvincias(idDepartamento);
+    } else {
+      this.provincias = [];
+      this.distritos = [];
+    }
+
+    let idProvincia = changes['cliente'].currentValue?.idProvincia;
+
+    if (idProvincia) {
+      this.cargarDistritos(idDepartamento, idProvincia);
+    } else {
+      this.distritos = [];
     }
   }
 
-  request(): GuardarEmpresaRequest {
+  cambiarDepartamento() {
+    this.provincias = [];
+    this.distritos = [];
+    this.form.get('idProvincia').setValue(null)
+    this.form.get('idDistrito').setValue(null)
+    this.cargarProvincias(this.form.get('idDepartamento').value)
+  }
+
+  cambiarProvincia() {
+    this.distritos = []
+    this.form.get('idDistrito').setValue(null)
+    const { idDepartamento, idProvincia } = this.form.value
+    this.cargarDistritos(idDepartamento, idProvincia)
+  }
+  cargarDepartamentos(): void {
+    this.parametroService.listado('1', '1', '1').pipe(
+      catchError(error => {
+        this.mensajeToast.errorServicioConsulta(error);
+        return EMPTY;
+      })
+    ).subscribe(response => {
+      if (response.codigo === 0) {
+        this.departamentos = response.respuesta;
+      } else {
+        this.departamentos = [];
+      }
+    });
+  }
+
+  cargarProvincias(idDepartamento: number): void {
+    this.loading = true
+    this.parametroService.listado('1', '1', '2', idDepartamento).pipe(
+      catchError(error => {
+        this.mensajeToast.errorServicioConsulta(error);
+        return EMPTY;
+      }), finalize(() => { this.loading = false })
+    ).subscribe(response => {
+      if (response.codigo === 0) {
+        this.provincias = response.respuesta;
+      } else {
+        this.provincias = [];
+      }
+    });
+  }
+
+  cargarDistritos(idDepartamento: number, idProvincia: number): void {
+    this.loading = true
+    this.parametroService.listado('1', '1', '3', idDepartamento, idProvincia).pipe(
+      catchError(error => {
+        this.mensajeToast.errorServicioConsulta(error);
+        return EMPTY;
+      }), finalize(() => { this.loading = false })
+    ).subscribe(response => {
+      if (response.codigo === 0) {
+        this.distritos = response.respuesta;
+      } else {
+        this.distritos = [];
+      }
+    });
+  }
+
+
+  request(): GuardarClienteRequest {
+    console.log(this.cliente)
     return {
-      id: this.empresa?.id || null,
-      ruc: this.form.get('ruc').value,
+      codEmpresa: this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0,
+      cliente: this.cliente.cliente,
+      ruc: this.cliente.ruc,
       razonSocial: this.form.get('razonSocial').value,
       nombreComercial: this.form.get('nombreComercial').value,
       direccion: this.form.get('direccion').value,
-      idEstado: this.empresa?.idEstado || 1, 
-      usuarioSesion: 1 
+      idDepartamento: this.form.get('idDepartamento').value,
+      idProvincia: this.form.get('idProvincia').value,
+      idDistrito: this.form.get('idDistrito').value,
+      idEstado: this.form.get('idEstado').value || 0,
+      usuarioSesion: this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0
     };
   }
 
-  guardar() { 
-   
-    this.empresaService.registrar(this.form.value as GuardarEmpresaRequest).pipe(
+  guardar() {
+    this.loading = true
+    this.clienteService.registrar(this.request()).pipe(
       catchError((errorResponse: any) => {
         this.mensajeToast.errorServicioGuardado(errorResponse);
         return EMPTY;
-      }), finalize(() => {} )
+      }), finalize(() => { this.loading = false })
     ).subscribe((response: ApiResponseCrud) => {
       const { respuesta, codigo, mensaje } = response;
-      if(codigo === 0 &&  respuesta =='200') { 
-        
+      if (codigo === 0 && respuesta == '200') {
+        this.mensajeToast.exito('Éxito', mensaje)
+      } else {
+        this.mensajeToast.error('Error', mensaje)
       }
     });
   }

@@ -113,7 +113,7 @@ export class ResiduosComponent {
                 this.mensajeService.error('Error',res.mensaje || 'Error al eliminar');
               }
             },
-            error: (err) => this.mensajeService.errorServicioConsulta(err)
+            error: (err) => this.mensajeService.errorServicioGuardado(err)
           });
       }
     });

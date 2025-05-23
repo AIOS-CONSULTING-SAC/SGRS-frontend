@@ -5,6 +5,9 @@ export interface GuardarEmpresaRequest {
   ruc: string;
   razonSocial: string;
   nombreComercial: string;
+  idDepartamento: number
+  idProvincia: number
+  idDistrito: number;
   direccion: string
   idEstado: number;
   usuarioSesion: number;
@@ -16,7 +19,9 @@ export interface EliminarEmpresaRequest {
 }
 
 export interface EmpresaTO {
-  id?: number;
+  cliente?: number;
+  codEmpresa?: number;
+  
   ruc: string;
   razonSocial: string;
   nombreComercial: string

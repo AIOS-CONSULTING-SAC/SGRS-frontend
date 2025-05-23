@@ -4,7 +4,7 @@ import { environment } from '../../enviroments/environment';
 import { EmpresaTO, GuardarEmpresaRequest, ListadoEmpresasResponse } from '../models/empresa/empresa.interface';
 import { Observable } from 'rxjs';
 import { ApiResponse, ApiResponseCrud } from '../models/respuesta';
-import { ClienteResponse, ListadoClientesResponse } from '../models/cliente/cliente.interface';
+import { ClienteResponse, GuardarClienteRequest, ListadoClientesResponse } from '../models/cliente/cliente.interface';
 
  const apiServicio = 'api/v1/clientes/'
 @Injectable({
@@ -23,16 +23,16 @@ export class ClienteService {
     return this.http.obtenerQueryGet<ListadoClientesResponse>(url)
   }
  
-  actualizar(request: GuardarEmpresaRequest) {
+  actualizar(request: GuardarClienteRequest) {
     return this.http.obtenerQueryPut(apiServicio, + 'actualizar', request)
   }
 
-  registrar(request: GuardarEmpresaRequest): Observable<ApiResponseCrud> {
+  registrar(request: GuardarClienteRequest): Observable<ApiResponseCrud> {
     return this.http.obtenerQueryPost<any>(apiServicio + 'guardar', request)
   }
 
-  eliminar(idEmpresa: number, usuarioSesion:number) {
-    let url = apiServicio + `eliminar?idEmpresa=${idEmpresa}&usuarioSesion=${usuarioSesion}`
+  eliminar(idCliente: number, idEmpresa: number, usuarioSesion:number) {
+    let url = apiServicio + `eliminar?idCliente=${idCliente}&idEmpresa=${idEmpresa}&usuarioSesion=${usuarioSesion}`
     return this.http.obtenerQueryDelete<any>(url)
   }
 }

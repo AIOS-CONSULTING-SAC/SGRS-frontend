@@ -20,7 +20,7 @@ import { ClienteResponse } from '../../../models/cliente/cliente.interface';
   styleUrl: './configurar.component.scss'
 })
 export class ConfigurarComponent {
-  @Input() cliente: ClienteResponse | null = null;
+  @Input() cliente!: ClienteResponse;
   @Output() volver = new EventEmitter();
   tabs = [
     { label: 'Locales', icon: 'pi pi-home' },

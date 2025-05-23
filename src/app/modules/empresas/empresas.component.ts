@@ -14,8 +14,8 @@ import { ClienteResponse } from '../../models/cliente/cliente.interface';
 })
 export class EmpresasComponent implements OnInit {
   private mostrarListadoSignal = signal(true);
-  private empresaSignal = signal<ClienteResponse | null>(null);
-  private configurarSignal = signal<ClienteResponse | null>(null);
+  private empresaSignal = signal<ClienteResponse | any>(null);
+  private configurarSignal = signal<ClienteResponse | any>(null);
   
   mostrarConfigurar= this.configurarSignal.asReadonly()
   mostrarListado = this.mostrarListadoSignal.asReadonly();

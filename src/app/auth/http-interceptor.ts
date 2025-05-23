@@ -27,8 +27,7 @@ export class CustomHttpInterceptor implements HttpInterceptor {
       return next.handle(req)
     }
 
-    const authToken = this.autenticacionService.obtenerToken()
-    console.log('Token obtenidoxx: ', authToken);
+    const authToken = this.autenticacionService.obtenerToken() 
     const contentType = req.headers.get('Content-Type') ?? 'application/json'
     const clonedReq = this.autorizacionCabecera(req, authToken, contentType)
 

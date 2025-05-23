@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core'; 
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
@@ -6,9 +6,12 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { UsuarioResponse } from '../../../models/usuario/usuario.interface';
+import { ListadoUsuarioResponse, UsuarioResponse } from '../../../models/usuario/usuario.interface';
 import { CommonModule } from '@angular/common';
 import { MensajesToastService } from '../../../shared/mensajes-toast.service';
+import { UsuarioService } from '../../../service/usuario.service';
+import { ListadoClientesResponse } from '../../../models/cliente/cliente.interface';
+import { catchError, EMPTY, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-listado',
@@ -18,48 +21,65 @@ import { MensajesToastService } from '../../../shared/mensajes-toast.service';
   styleUrl: './listado.component.scss'
 })
 export class ListadoComponent {
-  usuarios: UsuarioResponse[] = [
-    { id: 1, descEmpresa: 'ISOSEG PERÚ', tipoUsuario: 'Interno', rol: 'Administrador', nombres: 'Jaime', apellidos:'Santos',nroDocumento: '40442334', estado: 'Activo' },
-    { id: 1, descEmpresa: 'FORTICLIENT SAC', tipoUsuario: 'Externo', rol: 'Invitado', nombres: 'Jaime', apellidos:'Santos',nroDocumento: '40442334', estado: 'Activo' },
-    { id: 1, descEmpresa: 'GALAXY BIS', tipoUsuario: 'Externo', rol: 'Invitado', nombres: 'Jaime', apellidos:'Santos',nroDocumento: '40442334', estado: 'Activo' },
-  ];
+  usuarios: UsuarioResponse[] = [];
   loading = false;
-  razonSocial: string = '';
+
+  tipoUsuario: '1' | '2' | '' = '1';
+  empresa: string = '';
+  rol: string = '';
   ruc = '';
   estado: 'Activo' | 'Inactivo' | '' = 'Activo';
-  tipoUsuario: '1' | '2' | '' = '1';
-  rol:  '1' | '2' | '' = '';
-  empresa:'1' | '2' | '' = '';
+
   @Output() registrar = new EventEmitter();
   @Output() editar = new EventEmitter<UsuarioResponse>();
 
-  constructor(private confirmationService: ConfirmationService, 
-    private messageService: MensajesToastService) {
+  constructor(
+    private confirmationService: ConfirmationService,
+    private messageService: MensajesToastService,
+    private usuarioService: UsuarioService
+  ) {
     this.buscar();
   }
 
   buscar() {
     this.loading = true;
-    /*this.empresaService.listar({ razonSocial: this.razonSocial, ruc: this.ruc, estado: this.estado })
-      .subscribe(empresas => {
-        this.empresas = empresas;
-        this.loading = false;
-      });*/
+    const estadoNumerico = this.estado === 'Activo' ? 1 : this.estado === 'Inactivo' ? 0 : undefined;
+
+    this.usuarioService
+      .listar({
+        codEmpresa: this.tipoUsuario === '2' ? +this.empresa : undefined,
+        codCliente: undefined,
+        idEstado: estadoNumerico,
+      }).pipe(
+        catchError((errorResponse: any) => {
+          this.messageService.errorServicioConsulta(errorResponse);
+
+          return EMPTY;
+        }), finalize(() => { this.loading = false })
+      )
+      .subscribe((response: ListadoUsuarioResponse) => {
+        const { respuesta, codigo } = response;
+        if (codigo === 0) this.usuarios = respuesta
+        else this.usuarios = []
+
+      });
+
+    this.loading = true;
+
   }
 
   limpiar() {
-    this.razonSocial = '';
+    this.empresa = '';
+    this.rol = '';
     this.ruc = '';
     this.estado = 'Activo';
     this.buscar();
   }
 
-  eliminar(empresa: UsuarioResponse) {
-    console.log(empresa);
+  eliminar(usuario: UsuarioResponse) {
     this.confirmationService.confirm({
-
-      message: '¿Está seguro que desea desactivar el usuario <b>' + empresa.nombres + '</b> ? <br /><br />Podrá reactivar en cualquier momento.',
-      header: 'Eliminar empresa',
+      message: `¿Está seguro que desea desactivar el usuario <b>${usuario.nombres}</b>?<br><br>Podrá reactivarlo en cualquier momento.`,
+      header: 'Eliminar usuario',
       rejectLabel: 'Cancelar',
       rejectButtonProps: {
         label: 'Cancelar',
@@ -70,10 +90,19 @@ export class ListadoComponent {
         label: 'Confirmar',
         severity: 'danger',
       },
-
       accept: () => {
-        this.messageService.exito('Éxito', 'El usuario <b>' + empresa.nombres + '</b> fue desactivada correctamente.');
-      }
+        const usuarioSesion = 1; // <-- reemplazar con ID real del usuario logueado
+
+        this.usuarioService.eliminar(usuario.id, usuarioSesion).subscribe({
+          next: () => {
+            this.messageService.exito('Éxito', `El usuario <b>${usuario.nombres}</b> fue desactivado correctamente.`);
+            this.buscar(); // recarga el listado
+          },
+          error: () => {
+            this.messageService.error('Error', 'No se pudo desactivar el usuario.');
+          },
+        });
+      },
     });
   }
 }

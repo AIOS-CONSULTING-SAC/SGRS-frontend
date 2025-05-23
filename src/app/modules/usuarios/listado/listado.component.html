@@ -52,7 +52,7 @@
   </div>
 
 
-  <p-table [value]="usuarios" [paginator]="true" [rows]="10">
+  <p-table [value]="usuarios" [paginator]="true" [loading]="loading" [rows]="10">
     <ng-template pTemplate="header">
       <tr>
         <th>#</th>
@@ -71,9 +71,9 @@
         <td>{{ usuario.descEmpresa }}</td>
         <td>{{ usuario.tipoUsuario }}</td>
         <td>{{ usuario.rol }}</td>
-        <td>{{ usuario.nombres +' '+ usuario.apellidos }}</td>
-        <td>{{ usuario.nroDocumento }}</td>
-        <td>{{ usuario.estado }}</td>
+        <td>{{ usuario.nombre +' '+ usuario.apellidoP +' '+ usuario.apellidoM}}</td>
+        <td>{{ usuario.ndoc }}</td>
+        <td>{{ usuario.descEstado }}</td>
         <td>
           <button pButton icon="pi pi-pencil" (click)="editar.emit(usuario)" severity="contrast"
             class="p-button-text"></button>

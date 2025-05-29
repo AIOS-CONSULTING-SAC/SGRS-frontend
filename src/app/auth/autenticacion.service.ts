@@ -12,32 +12,17 @@ const apiServicio = 'api/v1/usuarios/'
   providedIn: 'root'
 })
 export class AutenticacionService {
-  private readonly usuarioSesion!: BehaviorSubject<string | null>
   constructor(
     private readonly http: HttpService,
-    private readonly httpClient: HttpClient,
-     private mensajeToast: MensajesToastService,
+    private readonly httpClient: HttpClient, 
      
   ) {
-    this.usuarioSesion = new BehaviorSubject<string | null>(
-      localStorage.getItem('accessToken')
-    )
+  
   }
 
-  iniciarSesion(request: IniciarSesionRequest): Observable<void> {
-    return this.http.obtenerQueryPost<any>(apiServicio + 'login', request).pipe(
-      map((response: any) => {
-        if (response.codigo === 200) {
-          const { accessToken, refreshToken } = response.respuesta;
-          localStorage.setItem('accessToken', accessToken);
-          localStorage.setItem('refreshToken', refreshToken);
-          this.usuarioSesion.next(accessToken);
-        } else {
-          throw new Error(response.mensaje);
-        }
-      })
-    );
-  }
+  iniciarSesion(request: IniciarSesionRequest): Observable<any> {
+  return this.http.obtenerQueryPost<any>(apiServicio + 'login', request);
+}
   
   
   refreshToken(): Observable<string> {
@@ -52,14 +37,14 @@ export class AutenticacionService {
     )
   }
 
-  public get usuarioLogeado(): any | null {
+  /*public get usuarioLogeado(): any | null {
     return this.usuarioSesion.value
-  }
+  }*/
 
   logout(): void {
     if (this.estaAutenticado()) {
       localStorage.clear()
-      this.usuarioSesion.next(null)
+     // this.usuarioSesion.next(null)
     }
    
   }

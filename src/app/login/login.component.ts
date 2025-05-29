@@ -9,6 +9,7 @@ import { RippleModule } from 'primeng/ripple';
 import { IniciarSesionRequest } from '../models/usuario/usuario.interface';
 import { AutenticacionService } from '../auth/autenticacion.service';
 import { MensajesToastService } from '../shared/mensajes-toast.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -17,43 +18,48 @@ import { MensajesToastService } from '../shared/mensajes-toast.service';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-
-
+  private readonly usuarioSesion!: BehaviorSubject<string | null>
   email: string = '';
-
   password: string = '';
-
   checked: boolean = false;
-
-  constructor( private  autenticacionService: AutenticacionService,
+  constructor(private autenticacionService: AutenticacionService,
     private mensajeToast: MensajesToastService,
-    
+
     private router: Router,
     private route: ActivatedRoute,
-  ){
 
+  ) {
+    this.usuarioSesion = new BehaviorSubject<string | null>(
+      localStorage.getItem('accessToken')
+    )
   }
 
-  cmdLogin() { 
-    const request: IniciarSesionRequest = new IniciarSesionRequest();
-    request.usuario = this.email;
-    request.password = this.password;
+  cmdLogin() {
+    const request: IniciarSesionRequest = {
+      usuario: this.email,
+      password: this.password
+    };
+
     this.autenticacionService.iniciarSesion(request).subscribe({
-      next: () => {
-        this.mensajeToast.exito('Bienvenido', 'Inicio de sesión exitoso');
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
-        if (returnUrl) { 
-          this.router.navigateByUrl(returnUrl); 
-        } else { 
-          this.router.navigate(['/dashboard']); 
+      next: (response: any) => {
+        if (response.codigo === 200) {
+          const { accessToken, refreshToken } = response.respuesta;
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken); 
+          this.mensajeToast.exito('Bienvenido', 'Inicio de sesión exitoso');
+
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+          this.router.navigateByUrl(returnUrl || '/dashboard');
+        } else {
+          this.mensajeToast.error('Fallo al iniciar sesión', response.mensaje || 'Credenciales incorrectas');
         }
       },
-      error: (error: any) => { 
-        this.mensajeToast.error('Fallo al iniciar sesión', error.message || 'Error en el servicio.');
+      error: (error: any) => {
+        console.error(error);
+        this.mensajeToast.error('Error de servicio', error.message || 'No se pudo conectar al servidor.');
       }
     });
-    
-     
   }
+
 
 }

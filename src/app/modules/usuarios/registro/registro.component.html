@@ -1,63 +1,105 @@
 <div class="p-6">
-    <h3 class="text-lg font-semibold text-slate-900 mb-4">
-      Listado de usuario > {{ usuario ? 'Editar usuario' : 'Registrar usuario' }}
-    </h3>
-  
-    <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div>
-          <app-form-input [formGroup]="form" controlName="ruc" label="RUC" placeholder="Ingrese RUC" [required]="true"
-            [formHelper]="formHelper" [maxLength]="20"></app-form-input>
-        </div>
-        <div>
-          <app-form-input [formGroup]="form" controlName="razonSocial" label="Razón social"
-            placeholder="Ingrese Razón social" [required]="true" [formHelper]="formHelper"
-            [maxLength]="100"></app-form-input>
-        </div>
-        <div>
-          <app-form-input [formGroup]="form" controlName="nombreComercial" label="Nombre comercial"
-            placeholder="Ingrese Nombre comercial" [required]="true" [formHelper]="formHelper"
-            [maxLength]="100"></app-form-input>
-        </div>
+  <h3 class="text-lg font-semibold text-slate-900 mb-4">
+    Listado de usuario > {{ usuario ? 'Editar usuario' : 'Registrar usuario' }}
+  </h3>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-4">
+    <input type="hidden" formControlName="idEmpresa" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"> 
+      <div *ngIf="this.usuario?.usuario == null">
+        <label class="block text-sm font-medium text-slate-700 mb-1">Tipo de usuario <small
+            class="p-error">*</small></label>
+        <p-dropdown [options]="tipoUsuario" formControlName="codTipoUser" optionLabel="descripcion1"
+          optionValue="correlativo" placeholder="Seleccione tipo" (ngModelChange)="cambiarTipoUsuario()"
+          [class]="formHelper.esClaseInvalido('codTipoUser')" class="w-full" />
+        <small *ngIf="formHelper.esCampoInvalido('codTipoUser')" class="p-error">
+          {{ formHelper.obtenerMensajeErrorDefecto() }}
+        </small>
       </div>
-  
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Departamento <small
-              class="p-error">*</small></label>
-          <p-dropdown [options]="['Lima', 'Cusco', 'Arequipa']" formControlName="departamento" placeholder="Seleccione"
-            class="w-full" [class]="formHelper.esClaseInvalido('departamento')" />
-          <small *ngIf="formHelper.esCampoInvalido('departamento')"
-            class="p-error">{{formHelper.obtenerMensajeErrorDefecto()}}</small>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Provincia <small class="p-error">*</small></label>
-          <p-dropdown [options]="['Lima', 'Urubamba', 'Camaná']" formControlName="provincia" placeholder="Seleccione"
-            class="w-full" [class]="formHelper.esClaseInvalido('provincia')" />
-          <small *ngIf="formHelper.esCampoInvalido('provincia')"
-            class="p-error">{{formHelper.obtenerMensajeErrorDefecto()}}</small>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Distrito <small class="p-error">*</small></label>
-          <p-dropdown [options]="['Miraflores', 'Yucay', 'Majes']" formControlName="distrito" placeholder="Seleccione"
-            class="w-full" [class]="formHelper.esClaseInvalido('distrito')" />
-          <small *ngIf="formHelper.esCampoInvalido('distrito')"
-            class="p-error">{{formHelper.obtenerMensajeErrorDefecto()}}</small>
-        </div>
-      </div> 
+      <div *ngIf="form.get('codTipoUser').value == 1">
+        <label class="block text-sm font-medium text-slate-700 mb-1">Empresa<small class="p-error">*</small></label>
+        <p-dropdown [options]="empresas" formControlName="codCliente" optionLabel="nombreComercial"
+          optionValue="cliente" placeholder="Seleccione tipo" class="w-full"
+          [class]="formHelper.esClaseInvalido('codCliente')" />
+        <small *ngIf="formHelper.esCampoInvalido('codCliente')" class="p-error">
+          {{ formHelper.obtenerMensajeErrorDefecto() }}
+        </small>
+      </div>
+      <div *ngIf="form.get('codTipoUser').value == 2">
+        <label class="block text-sm font-medium text-slate-700 mb-1">Rol <small class="p-error">*</small></label>
+        <p-dropdown [options]="tipoPerfil" formControlName="codPerfil" optionLabel="descripcion1"
+          optionValue="correlativo" placeholder="Seleccione perfil" class="w-full"
+          [class]="formHelper.esClaseInvalido('codPerfil')" />
+        <small *ngIf="formHelper.esCampoInvalido('codPerfil')" class="p-error">
+          {{ formHelper.obtenerMensajeErrorDefecto() }}
+        </small>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div>
-        <app-form-input [formGroup]="form" controlName="direccion" label="Dirección"
-          placeholder="Ingrese Dirección" [required]="true" [formHelper]="formHelper"
-          [maxLength]="100"></app-form-input>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Tipo de documento <small
+            class="p-error">*</small></label>
+        <p-dropdown [options]="tipoDocumento" formControlName="codTipoDoc" optionLabel="descripcion1"
+          optionValue="correlativo" placeholder="Seleccione tipo" class="w-full"
+          [class]="formHelper.esClaseInvalido('codTipoDoc')" />
+        <small *ngIf="formHelper.esCampoInvalido('codTipoDoc')" class="p-error">
+          {{ formHelper.obtenerMensajeErrorDefecto() }}
+        </small>
       </div>
-  
-      <div class="flex justify-end flex-wrap gap-3 mb-6">
-        <button pButton label="Registrar" type="submit" icon="pi pi-save"
-        [raised]="true" severity="contrast" class="min-w-[130px]"></button>
-        <button pButton label="Ir atrás" type="button"
-         (click)="volver.emit()" [raised]="true" icon="pi pi-arrow-left"
+      <div>
+        <app-form-input [formGroup]="form" controlName="ndoc" label="N° Documento" placeholder="Ingrese documento"
+          [required]="true" [formHelper]="formHelper"  [maxLength]="20"></app-form-input>
+      </div>
+      <div>
+        <app-form-input [formGroup]="form" controlName="nombre" label="Nombres" placeholder="Ingrese nombres"
+          [required]="true" [formHelper]="formHelper" [maxLength]="100"></app-form-input>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div>
+        <app-form-input [formGroup]="form" controlName="apellidoP" label="Apellido paterno"
+          placeholder="Ingrese apellido paterno" [required]="true" [formHelper]="formHelper"
+          [maxLength]="50"></app-form-input>
+      </div>
+      <div>
+        <app-form-input [formGroup]="form" controlName="apellidoM" label="Apellido materno"
+          placeholder="Ingrese apellido materno" [required]="true" [formHelper]="formHelper"
+          [maxLength]="50"></app-form-input>
+      </div>
+      <div>
+        <app-form-input [formGroup]="form" controlName="telefono" label="Teléfono" placeholder="Ingrese teléfono"
+          [formHelper]="formHelper" [maxLength]="15"></app-form-input>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ">
+      <div>
+        <app-form-input [formGroup]="form" controlName="correo" label="Correo electrónico" placeholder="Ingrese correo"
+          [required]="true" [formHelper]="formHelper" [maxLength]="100"></app-form-input>
+      </div>
+      <div *ngIf="this.usuario?.usuario != null">
+        <label class="block text-sm font-medium text-slate-700 mb-1">Estado</label>
+        
+        <p-dropdown [options]="estados" optionLabel="descripcion"
+          optionValue="codigo" 
+          formControlName="idEstado" placeholder="Seleccione estado" class="w-full"
+          [class]="formHelper.esClaseInvalido('idEstado')" />
+        <small *ngIf="formHelper.esCampoInvalido('idEstado')" class="p-error">
+          {{ formHelper.obtenerMensajeErrorDefecto() }}
+        </small>
+      </div>
+      
+    </div>
+ 
+    <div class="flex justify-end flex-wrap gap-3 mb-6">
+      <button pButton label="Registrar" type="submit" icon="pi pi-save" [raised]="true" severity="contrast"
+        class="min-w-[130px]" ></button>
+      <button pButton label="Ir atrás" type="button" (click)="volver.emit()" [raised]="true" icon="pi pi-arrow-left"
         severity="secondary" class="min-w-[130px]"></button>
-      </div>
-    </form>
-  
-  </div>
+    </div>
+  </form>
+
+
+</div>

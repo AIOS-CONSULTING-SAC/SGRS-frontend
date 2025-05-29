@@ -43,12 +43,12 @@
 
 
   <div class="flex justify-end flex-wrap gap-3 mb-6">
-    <p-button label="Limpiar" severity="secondary" [raised]="true" icon="pi pi-eraser" (onClick)="limpiar()"
-      class="w-full sm:w-auto text-gray-700" [style]="{'min-width': '130px'}" />
-    <button pButton label="Buscar" severity="info" [raised]="true" (onClick)="buscar()" icon="pi pi-search"
+    <button pButton label="Limpiar" severity="secondary" [raised]="true" icon="pi pi-eraser" (click)="limpiar()"
+      class="w-full sm:w-auto text-gray-700" [style]="{'min-width': '130px'}"></button>
+    <button pButton label="Buscar" severity="info" [raised]="true" (click)="buscar()" icon="pi pi-search"
       styleClass=" text-gray-700" class="w-full sm:w-auto text-gray-700" [style]="{'min-width': '130px'}"></button>
-    <p-button label="Registrar" severity="contrast" [raised]="true" (onClick)="registrar.emit()"
-      class="w-full sm:w-auto" icon="pi pi-plus" [style]="{'min-width': '130px'}" />
+    <button pButton label="Registrar" severity="contrast" [raised]="true" (click)="registrar.emit()"
+      class="w-full sm:w-auto" icon="pi pi-plus" [style]="{'min-width': '130px'}"></button>
   </div>
 
 
@@ -68,21 +68,21 @@
     <ng-template pTemplate="body" let-usuario let-i="rowIndex">
       <tr>
         <td>{{ i + 1 }}</td>
-        <td>{{ usuario.descEmpresa }}</td>
-        <td>{{ usuario.tipoUsuario }}</td>
-        <td>{{ usuario.rol }}</td>
+        <td>{{ usuario.descCliente }}</td>
+        <td>{{ usuario.descTipoUser }}</td>
+        <td>{{ usuario.descPerfil }}</td>
         <td>{{ usuario.nombre +' '+ usuario.apellidoP +' '+ usuario.apellidoM}}</td>
         <td>{{ usuario.ndoc }}</td>
         <td>{{ usuario.descEstado }}</td>
-        <td>
-          <button pButton icon="pi pi-pencil" (click)="editar.emit(usuario)" severity="contrast"
+        <td> 
+            <button pButton icon="pi pi-pencil" size="small" (click)="editar.emit(usuario)" severity="contrast"
             class="p-button-text"></button>
-          <button pButton icon="pi pi-trash" (click)="eliminar(usuario)" class="p-button-text"
-            severity="danger"></button>
+          <button pButton icon="pi pi-trash" size="small"  *ngIf="usuario.idEstado==1" (click)="eliminar(usuario)"
+            class="p-button-text" severity="danger"></button>
         </td>
       </tr>
     </ng-template>
   </p-table>
 </div>
 
-<p-confirmdialog [style]="{'width':'320px'}" />
+<p-confirmdialog [style]="{'width':'420px'}" />

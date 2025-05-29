@@ -8,6 +8,7 @@ import { LoginComponent } from './app/login/login.component';
 import { EmpresasComponent } from './app/modules/empresas/empresas.component';
 import { UsuariosComponent } from './app/modules/usuarios/usuarios.component';
 import { AuthGuard } from './app/auth/auth.guard';
+import { ParametrosComponent } from './app/modules/parametros/parametros.component';
 
 export const appRoutes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -20,6 +21,7 @@ export const appRoutes: Routes = [
             { path: 'dashboard', component: Dashboard },
             { path: 'empresa', data: { breadcrumb: 'Mantenimiento > Empresas' }, component:EmpresasComponent},
             { path: 'usuario', data: { breadcrumb: 'Mantenimiento > Usuarios' }, component: UsuariosComponent },
+            { path: 'parametro', data: { breadcrumb: 'Mantenimiento > Parametros' }, component: ParametrosComponent },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },

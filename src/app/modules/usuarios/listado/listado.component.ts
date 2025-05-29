@@ -12,6 +12,7 @@ import { MensajesToastService } from '../../../shared/mensajes-toast.service';
 import { UsuarioService } from '../../../service/usuario.service';
 import { ListadoClientesResponse } from '../../../models/cliente/cliente.interface';
 import { catchError, EMPTY, finalize } from 'rxjs';
+import { AutenticacionService } from '../../../auth/autenticacion.service';
 
 @Component({
   selector: 'app-listado',
@@ -36,7 +37,8 @@ export class ListadoComponent {
   constructor(
     private confirmationService: ConfirmationService,
     private messageService: MensajesToastService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private autenticacionService: AutenticacionService
   ) {
     this.buscar();
   }
@@ -78,7 +80,8 @@ export class ListadoComponent {
 
   eliminar(usuario: UsuarioResponse) {
     this.confirmationService.confirm({
-      message: `¿Está seguro que desea desactivar el usuario <b>${usuario.nombres}</b>?<br><br>Podrá reactivarlo en cualquier momento.`,
+
+      message: '¿Está seguro que desea desactivar el usuario <b>' + usuario.correo + '</b> ? <br /><br />Podrá reactivarlo en cualquier momento.',
       header: 'Eliminar usuario',
       rejectLabel: 'Cancelar',
       rejectButtonProps: {
@@ -90,19 +93,21 @@ export class ListadoComponent {
         label: 'Confirmar',
         severity: 'danger',
       },
-      accept: () => {
-        const usuarioSesion = 1; // <-- reemplazar con ID real del usuario logueado
 
-        this.usuarioService.eliminar(usuario.id, usuarioSesion).subscribe({
-          next: () => {
-            this.messageService.exito('Éxito', `El usuario <b>${usuario.nombres}</b> fue desactivado correctamente.`);
-            this.buscar(); // recarga el listado
-          },
-          error: () => {
-            this.messageService.error('Error', 'No se pudo desactivar el usuario.');
-          },
-        });
-      },
+      accept: () => {
+         this.usuarioService.eliminar(usuario.usuario, this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0)
+          .pipe(finalize(() => this.buscar()))
+          .subscribe({
+            next: (res) => {
+              if (res.codigo === 0) {
+                this.messageService.exito('Éxito','Se desactivó el usuario correctamente');
+              } else {
+                this.messageService.error('Error',res.mensaje || 'Error al eliminar');
+              }
+            },
+            error: (err) => this.messageService.errorServicioGuardado(err)
+          });
+      }, 
     });
   }
 }

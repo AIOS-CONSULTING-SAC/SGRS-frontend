@@ -1,32 +1,43 @@
 import { ApiResponse } from "../respuesta";
 
 export interface UsuarioResponse {
-  id: number;
+usuario: number;
+  codEmpresa: number;
   descEmpresa: string;
-  tipoUsuario: string;
-  rol: string;
-  nombres: string;
-  apellidos: string;
-  nroDocumento: string;
-  estado: string;
+  codCliente: number;
+  descCliente: string;
+  codTipoUser: number;
+  descTipoUser: string;
+  codPerfil: number;
+  descPerfil: string;
+  codTipoDoc: number;
+  ndoc: string;
+  nombre: string;
+  apellidoP: string;
+  apellidoM: string;
+  telefono: string;
+  correo: string;
+  idEstado: number; 
+  descEstado: string;
+  fechaRegistro: Date;
 }
 
 export type ListadoUsuarioResponse = ApiResponse<UsuarioResponse[]>
 
 export interface GuardarUsuarioRequest {
-  idUsuario?: number;
-  idEmpresa?: number;
-  idcliente?: number;
-  idTipoUser?: number;
-  idPerfil?: number;
-  idTipoDoc?: number;
-  ndoc?: string;
-  nombre?: string;
-  apellidoP?: string;
-  apellidoM?: string;
-  correo?: string;
-  password?: string;
-  idEstado: number;
+  idUsuario: number | null;
+  idEmpresa: number;
+  idcliente: number;
+  idTipoUser: number;
+  idPerfil: number;
+  idTipoDoc: number;
+  ndoc: string;
+  nombre: string;
+  apellidoP: string;
+  apellidoM: string;
+  telefono: string;
+  correo: string; 
+  idEstado: number; 
   usuarioSesion: number;
   mensaje?: string;
 }

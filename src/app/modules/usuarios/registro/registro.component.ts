@@ -16,10 +16,11 @@ import { catchError, EMPTY, finalize } from 'rxjs';
 import { ApiResponseCrud } from '../../../models/respuesta';
 import { ClienteService } from '../../../service/cliente.service';
 import { ClienteResponse, ListadoClientesResponse } from '../../../models/cliente/cliente.interface';
+import { LoadingComponent } from '../../../shared/loading/loading.component';
 
 @Component({
   selector: 'app-registro',
-  imports: [DropdownModule, FormsModule, ReactiveFormsModule, CommonModule, InputTextModule, ButtonModule, FormInputComponent],
+  imports: [DropdownModule, FormsModule, LoadingComponent, ReactiveFormsModule, CommonModule, InputTextModule, ButtonModule, FormInputComponent],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.scss'
 })
@@ -46,7 +47,7 @@ export class RegistroComponent {
     this.cargarTipoDoc()
     this.setearEstados()
     this.form = this.fb.group({
-      idUsuario: [this.usuario?.usuario || null],
+      usuario: [this.usuario?.usuario || null],
       idEmpresa: [this.usuario?.codEmpresa || '', Validators.required],
 
       codTipoUser: [this.usuario?.codTipoUser || '', Validators.required],
@@ -101,12 +102,14 @@ export class RegistroComponent {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.form.patchValue(changes['usuario'].currentValue); 
+    this.form.patchValue(changes['usuario'].currentValue);  
     this.cambiarTipoUsuario()
-    const modificarUsuario = this.form.get('idUsuario').value == null
+    const modificarUsuario = this.form.get('usuario').value !== null
     if(modificarUsuario){
       this.form.get('correo').disable();
-      this.form.get('idUsuario').disable();
+      this.form.get('usuario').disable();
+    } else{
+      this.form.get('correo').enable();
     }
     const bloquearUsuarioExt = modificarUsuario && this.form.get('codTipoUser').value == 1;
     if (bloquearUsuarioExt) {
@@ -182,7 +185,7 @@ export class RegistroComponent {
 
   request(): GuardarUsuarioRequest {
     return {
-      idUsuario: this.form.get('idUsuario').value,
+      idUsuario: this.form.get('usuario').value,
       idEmpresa: this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0,
       idcliente: this.form.get('codCliente').value,
       idTipoUser: this.form.get('codTipoUser').value,

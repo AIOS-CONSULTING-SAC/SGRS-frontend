@@ -11,7 +11,7 @@ export interface GuardarResiduoRequest {
 }
 
 export interface ResiduoResponse {
-  idResiduo: number;
+  residuo: number;
   codCliente: number; 
   idUnidad: number;
   descripcion?: string;

@@ -13,6 +13,7 @@ import { ListadoResiduosEmpresaResponse, ResiduoResponse } from '../../../../mod
 import { ClienteResponse } from '../../../../models/cliente/cliente.interface';
 import { ResiduoService } from '../../../../service/residuo.service';
 import { InputTextModule } from 'primeng/inputtext';
+import { AutenticacionService } from '../../../../auth/autenticacion.service';
 
 @Component({
   selector: 'app-residuos',
@@ -39,11 +40,12 @@ export class ResiduosComponent {
 
   @ViewChild(RegistrarResiduoComponent) registrarResiduo!: RegistrarResiduoComponent;
    @Input() cliente!: ClienteResponse;
-  @Input() usuarioSesion!: number;
+  
 
   constructor(
     private mensajeService: MensajesToastService,
     private residuosService: ResiduoService,
+    private autenticacionService: AutenticacionService,
     private confirmationService: ConfirmationService
   ) {}
 
@@ -76,14 +78,14 @@ export class ResiduosComponent {
   registrar() {
     this.registrarResiduo.abrir('Registrar residuo', {
       codCliente: this.cliente?.cliente,
-      usuarioSesion: this.usuarioSesion
+      usuarioSesion: this.autenticacionService.getDatosToken()?.codigoUsuario
     });
   }
 
   editar(residuo: ResiduoResponse) {
     this.registrarResiduo.abrir('Editar residuo', {
       ...residuo,
-      usuarioSesion: this.usuarioSesion
+      usuarioSesion: this.autenticacionService.getDatosToken()?.codigoUsuario
     });
   }
 
@@ -103,7 +105,7 @@ export class ResiduosComponent {
       },
       accept: () => {
         this.residuosService
-          .eliminar(residuo.idResiduo, this.usuarioSesion.toString())
+          .eliminar(residuo.residuo, this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0)
           .pipe(finalize(() => this.buscar()))
           .subscribe({
             next: (res) => {

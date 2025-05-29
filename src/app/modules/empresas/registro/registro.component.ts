@@ -17,6 +17,7 @@ import { ClienteService } from '../../../service/cliente.service';
 import { ClienteResponse, GuardarClienteRequest } from '../../../models/cliente/cliente.interface';
 import { AutenticacionService } from '../../../auth/autenticacion.service';
 import { LoadingComponent } from '../../../shared/loading/loading.component';
+import { PARAMETROS } from '../../../shared/sistema-enums';
 
 @Component({
   selector: 'app-registro',
@@ -101,7 +102,9 @@ export class RegistroComponent {
     this.cargarDistritos(idDepartamento, idProvincia)
   }
   cargarDepartamentos(): void {
-    this.parametroService.listado('1', '1', '1').pipe(
+    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS, 
+      PARAMETROS.MANTENIMIENTO.EMPRESAS.DEPARTAMENTOS).pipe(
       catchError(error => {
         this.mensajeToast.errorServicioConsulta(error);
         return EMPTY;
@@ -117,7 +120,9 @@ export class RegistroComponent {
 
   cargarProvincias(idDepartamento: number): void {
     this.loading = true
-    this.parametroService.listado('1', '1', '2', idDepartamento).pipe(
+    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
+      PARAMETROS.MANTENIMIENTO.EMPRESAS.PROVINCIAS, idDepartamento).pipe(
       catchError(error => {
         this.mensajeToast.errorServicioConsulta(error);
         return EMPTY;
@@ -133,7 +138,9 @@ export class RegistroComponent {
 
   cargarDistritos(idDepartamento: number, idProvincia: number): void {
     this.loading = true
-    this.parametroService.listado('1', '1', '3', idDepartamento, idProvincia).pipe(
+    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
+      PARAMETROS.MANTENIMIENTO.EMPRESAS.DISTRITOS, idDepartamento, idProvincia).pipe(
       catchError(error => {
         this.mensajeToast.errorServicioConsulta(error);
         return EMPTY;

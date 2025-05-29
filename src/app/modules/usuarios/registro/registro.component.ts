@@ -17,6 +17,7 @@ import { ApiResponseCrud } from '../../../models/respuesta';
 import { ClienteService } from '../../../service/cliente.service';
 import { ClienteResponse, ListadoClientesResponse } from '../../../models/cliente/cliente.interface';
 import { LoadingComponent } from '../../../shared/loading/loading.component';
+import { PARAMETROS } from '../../../shared/sistema-enums';
 
 @Component({
   selector: 'app-registro',
@@ -70,10 +71,10 @@ export class RegistroComponent {
 
     if (this.usuario) {
 
-    } 
+    }
   }
 
-  setearEstados(){
+  setearEstados() {
     this.estados = [
       { codigo: 1, descripcion: 'Activo' },
       { codigo: 0, descripcion: 'Inactivo' }
@@ -102,20 +103,20 @@ export class RegistroComponent {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.form.patchValue(changes['usuario'].currentValue);  
+    this.form.patchValue(changes['usuario'].currentValue);
     this.cambiarTipoUsuario()
     const modificarUsuario = this.form.get('usuario').value !== null
-    if(modificarUsuario){
+    if (modificarUsuario) {
       this.form.get('correo').disable();
       this.form.get('usuario').disable();
-    } else{
+    } else {
       this.form.get('correo').enable();
     }
     const bloquearUsuarioExt = modificarUsuario && this.form.get('codTipoUser').value == 1;
     if (bloquearUsuarioExt) {
-      this.form.get('codCliente').disable(); 
+      this.form.get('codCliente').disable();
     } else {
-      this.form.get('codCliente').enable(); 
+      this.form.get('codCliente').enable();
     }
   }
 
@@ -123,18 +124,20 @@ export class RegistroComponent {
 
   cargarTipoUsuario(): void {
     this.loading = true
-    this.parametroService.listado('1', '2', '1').pipe(
-      catchError(error => {
-        this.mensajeToast.errorServicioConsulta(error);
-        return EMPTY;
-      }), finalize(() => { this.loading = false })
-    ).subscribe(response => {
-      if (response.codigo === 0) {
-        this.tipoUsuario = response.respuesta;
-      } else {
-        this.tipoUsuario = [];
-      }
-    });
+    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
+      PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_USUARIO).pipe(
+        catchError(error => {
+          this.mensajeToast.errorServicioConsulta(error);
+          return EMPTY;
+        }), finalize(() => { this.loading = false })
+      ).subscribe(response => {
+        if (response.codigo === 0) {
+          this.tipoUsuario = response.respuesta;
+        } else {
+          this.tipoUsuario = [];
+        }
+      });
   }
 
   cargarClientes() {
@@ -154,7 +157,9 @@ export class RegistroComponent {
 
   cargarTipoDoc(): void {
     this.loading = true
-    this.parametroService.listado('1', '2', '3').pipe(
+    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO, 
+      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS, 
+    PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_DOCUMENTO).pipe(
       catchError(error => {
         this.mensajeToast.errorServicioConsulta(error);
         return EMPTY;
@@ -169,7 +174,9 @@ export class RegistroComponent {
   cargarPerfiles(): void {
     this.loading = true
 
-    this.parametroService.listado('1', '2', '2').pipe(
+    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO, 
+      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS, 
+    PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL).pipe(
       catchError(error => {
         this.mensajeToast.errorServicioConsulta(error);
         return EMPTY;

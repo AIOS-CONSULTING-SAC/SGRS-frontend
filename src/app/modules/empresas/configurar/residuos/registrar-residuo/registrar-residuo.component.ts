@@ -14,6 +14,9 @@ import { MensajesToastService } from '../../../../../shared/mensajes-toast.servi
 import { GuardarResiduoRequest } from '../../../../../models/residuo/residuo.interface';
 import { AutenticacionService } from '../../../../../auth/autenticacion.service';
 import { ApiResponseCrud } from '../../../../../models/respuesta';
+import { ParametroService } from '../../../../../service/parametro.service';
+import { PARAMETROS } from '../../../../../shared/sistema-enums';
+import { ParametroResponse } from '../../../../../models/parametro/parametro.interface';
 
 @Component({
   selector: 'app-registrar-residuo',
@@ -29,6 +32,7 @@ export class RegistrarResiduoComponent implements OnInit {
   titulo = signal('Registrar residuo');
   form: FormGroup | any;
   formHelper !: any;
+  unidadesMedida: ParametroResponse[] = []
 
   loading = signal(false);
   @Output() guardado = new EventEmitter<string>();
@@ -37,7 +41,7 @@ export class RegistrarResiduoComponent implements OnInit {
     private fb: FormBuilder,
     private residuosService: ResiduoService,
     private mensajeService: MensajesToastService,
-
+    private parametroService: ParametroService,
     private autenticacionService: AutenticacionService
   ) {
     this.form = this.fb.group({
@@ -52,7 +56,7 @@ export class RegistrarResiduoComponent implements OnInit {
 
   ngOnInit(): void {
     this.formHelper = new FormHelper(this.form);
-
+    this.cargarUnidadesMedida()
   }
   abrir(titulo: string, data?: any) {
     this.titulo.set(titulo);
@@ -65,34 +69,49 @@ export class RegistrarResiduoComponent implements OnInit {
     this.visible.set(false);
   }
 
+  cargarUnidadesMedida(): void {
+
+    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
+      PARAMETROS.MANTENIMIENTO.EMPRESAS.UNIDADES_MEDIDA).pipe(
+        catchError(error => {
+          this.mensajeService.errorServicioConsulta(error);
+          return EMPTY;
+        }), finalize(() => { })
+      ).subscribe(response => {
+        this.unidadesMedida = response.codigo === 0 ? response.respuesta ?? [] : [];
+      });
+  }
   guardar() {
-    if (this.form.invalid) {
+    if (this.form.valid) {
+
+      const formValue: GuardarResiduoRequest = this.form.getRawValue();
+      formValue.usuarioSesion = this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0;
+      const peticion = formValue.residuo
+        ? this.residuosService.actualizar(formValue)
+        : this.residuosService.registrar(formValue);
+
+      this.loading.set(true);
+      peticion.pipe(
+        catchError((errorResponse: any) => {
+          this.mensajeService.errorServicioGuardado(errorResponse);
+          return EMPTY;
+        }), finalize(() => { this.loading.set(false); })
+      ).subscribe((response: ApiResponseCrud) => {
+        const { respuesta, codigo, mensaje } = response;
+        if (codigo === 0 && respuesta == '200') {
+          this.guardado.emit(mensaje);
+          this.form.reset();
+          this.visible.set(false);
+        } else {
+          this.mensajeService.error('Error', mensaje);
+        }
+      });
+
+    } else {
       this.form.markAllAsTouched();
       return;
     }
-
-    const formValue: GuardarResiduoRequest = this.form.getRawValue();
-    formValue.usuarioSesion = this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0;
-    const peticion = formValue.residuo
-      ? this.residuosService.actualizar(formValue)
-      : this.residuosService.registrar(formValue);
-
-    this.loading.set(true);
-    peticion.pipe(
-      catchError((errorResponse: any) => {
-        this.mensajeService.errorServicioGuardado(errorResponse);
-        return EMPTY;
-      }), finalize(() => { this.loading.set(false); })
-    ).subscribe((response: ApiResponseCrud) => {
-      const { respuesta, codigo, mensaje } = response;
-      if (codigo === 0 && respuesta == '200') {
-        this.guardado.emit(mensaje);
-        this.form.reset();
-        this.visible.set(false);
-      } else {
-        this.mensajeService.error('Error', mensaje);
-      }
-    });
   }
 
   cancelar() {

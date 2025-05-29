@@ -13,15 +13,17 @@ export class UsuarioService {
   constructor(private http: HttpService) {}
 
   listar(params: {
-    codUsuario?: number;
-    codEmpresa?: number;
-    codCliente?: number;
+    tipoUser?: number;
+    perfil?: number;
+    nroDocumento?: string;
+    nombre?: string;
     idEstado?: number;
   }): Observable<ListadoUsuarioResponse> {
     let queryParams = [];
-    if (params.codUsuario != null) queryParams.push(`codUsuario=${params.codUsuario}`);
-    if (params.codEmpresa != null) queryParams.push(`codEmpresa=${params.codEmpresa}`);
-    if (params.codCliente != null) queryParams.push(`codCliente=${params.codCliente}`);
+    if (params.tipoUser != null) queryParams.push(`tipoUser=${params.tipoUser}`);
+    if (params.perfil != null) queryParams.push(`perfil=${params.perfil}`);
+    if (params.nroDocumento != null) queryParams.push(`nroDocumento=${params.nroDocumento}`);
+    if (params.nombre != null) queryParams.push(`nombre=${params.nombre}`);
     if (params.idEstado != null) queryParams.push(`idEstado=${params.idEstado}`);
     const url = apiUsuario + 'listar?' + queryParams.join('&');
     return this.http.obtenerQueryGet<ListadoUsuarioResponse>(url);

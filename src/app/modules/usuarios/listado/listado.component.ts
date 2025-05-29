@@ -10,9 +10,13 @@ import { ListadoUsuarioResponse, UsuarioResponse } from '../../../models/usuario
 import { CommonModule } from '@angular/common';
 import { MensajesToastService } from '../../../shared/mensajes-toast.service';
 import { UsuarioService } from '../../../service/usuario.service';
-import { ListadoClientesResponse } from '../../../models/cliente/cliente.interface';
-import { catchError, EMPTY, finalize } from 'rxjs';
+import { ClienteResponse, ListadoClientesResponse } from '../../../models/cliente/cliente.interface';
+import { catchError, EMPTY, finalize, forkJoin } from 'rxjs';
 import { AutenticacionService } from '../../../auth/autenticacion.service';
+import { ParametroService } from '../../../service/parametro.service';
+import { PARAMETROS } from '../../../shared/sistema-enums';
+import { ParametroResponse } from '../../../models/parametro/parametro.interface';
+import { ClienteService } from '../../../service/cliente.service';
 
 @Component({
   selector: 'app-listado',
@@ -25,36 +29,106 @@ export class ListadoComponent {
   usuarios: UsuarioResponse[] = [];
   loading = false;
 
-  tipoUsuario: '1' | '2' | '' = '1';
   empresa: string = '';
-  rol: string = '';
+
   ruc = '';
+  nombres: string = ''
   estado: 'Activo' | 'Inactivo' | '' = 'Activo';
 
+  tipoUsuario: ParametroResponse[] = [];
+  idTipoUsuario: string = '';
+  tipoPerfil: ParametroResponse[] = [];
+  empresas: ClienteResponse[] = [];
+  idTipoPerfil: string = '';
   @Output() registrar = new EventEmitter();
   @Output() editar = new EventEmitter<UsuarioResponse>();
 
   constructor(
     private confirmationService: ConfirmationService,
-    private messageService: MensajesToastService,
+    private mensajeToast: MensajesToastService,
     private usuarioService: UsuarioService,
+    private clienteService: ClienteService,
+    private parametroService: ParametroService,
     private autenticacionService: AutenticacionService
   ) {
-    this.buscar();
+    this.cargarDatosIniciales()
+    //this.buscar();
+  }
+
+  private obtenerClientes() {
+    return this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa).pipe(
+      catchError(error => {
+        this.mensajeToast.errorServicioConsulta(error);
+        return EMPTY;
+      })
+    );
+  }
+
+  private obtenerTipoUsuario() {
+    return this.parametroService.listado(
+      PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
+      PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_USUARIO
+    ).pipe(
+      catchError(error => {
+        this.mensajeToast.errorServicioConsulta(error);
+        return EMPTY;
+      })
+    );
+  }
+
+  private obtenerPerfiles() {
+    return this.parametroService.listado(
+      PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
+      PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL
+    ).pipe(
+      catchError(error => {
+        this.mensajeToast.errorServicioConsulta(error);
+        return EMPTY;
+      })
+    );
+  }
+
+  cargarDatosIniciales(): void {
+    this.loading = true;
+    forkJoin([
+      this.obtenerClientes(),
+      this.obtenerTipoUsuario(),
+      this.obtenerPerfiles()
+    ]).pipe(
+      finalize(() => this.loading = false)
+    ).subscribe(([clientesResp, tipoUsuarioResp, perfilesResp]) => {
+      this.empresas = clientesResp?.codigo === 0 ? clientesResp.respuesta : [];
+      this.tipoUsuario = tipoUsuarioResp?.codigo === 0 ? tipoUsuarioResp.respuesta : [];
+      this.tipoPerfil = perfilesResp?.codigo === 0 ? perfilesResp.respuesta : [];
+    });
+  }
+
+
+  cambiarTipoUsuario() {
+    this.usuarios =[]
   }
 
   buscar() {
     this.loading = true;
+    if (this.idTipoUsuario == '') {
+      this.mensajeToast.error('Error', 'Debe seleccionar un tipo de usuario.');
+      this.loading = false
+      return
+    }
     const estadoNumerico = this.estado === 'Activo' ? 1 : this.estado === 'Inactivo' ? 0 : undefined;
 
     this.usuarioService
       .listar({
-        codEmpresa: this.tipoUsuario === '2' ? +this.empresa : undefined,
-        codCliente: undefined,
+        tipoUser: this.idTipoUsuario ? +this.idTipoUsuario : undefined,
+        perfil: this.idTipoPerfil ? +this.idTipoPerfil : undefined,
+        nroDocumento: this.ruc,
+        nombre: this.nombres,
         idEstado: estadoNumerico,
       }).pipe(
         catchError((errorResponse: any) => {
-          this.messageService.errorServicioConsulta(errorResponse);
+          this.mensajeToast.errorServicioConsulta(errorResponse);
 
           return EMPTY;
         }), finalize(() => { this.loading = false })
@@ -72,10 +146,12 @@ export class ListadoComponent {
 
   limpiar() {
     this.empresa = '';
-    this.rol = '';
+    this.idTipoUsuario = ''
+    this.idTipoPerfil = '';
     this.ruc = '';
+    this.nombres = ''
     this.estado = 'Activo';
-    this.buscar();
+    this.usuarios = []
   }
 
   eliminar(usuario: UsuarioResponse) {
@@ -95,19 +171,19 @@ export class ListadoComponent {
       },
 
       accept: () => {
-         this.usuarioService.eliminar(usuario.usuario, this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0)
+        this.usuarioService.eliminar(usuario.usuario, this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0)
           .pipe(finalize(() => this.buscar()))
           .subscribe({
             next: (res) => {
               if (res.codigo === 0) {
-                this.messageService.exito('Éxito','Se desactivó el usuario correctamente');
+                this.mensajeToast.exito('Éxito', 'Se desactivó el usuario correctamente');
               } else {
-                this.messageService.error('Error',res.mensaje || 'Error al eliminar');
+                this.mensajeToast.error('Error', res.mensaje || 'Error al eliminar');
               }
             },
-            error: (err) => this.messageService.errorServicioGuardado(err)
+            error: (err) => this.mensajeToast.errorServicioGuardado(err)
           });
-      }, 
+      },
     });
   }
 }

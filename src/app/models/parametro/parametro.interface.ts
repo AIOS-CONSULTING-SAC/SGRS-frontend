@@ -9,6 +9,8 @@ parametro: number;
   prefijo: number;
   correlativo: number;
   descripcion1: string;
+  descripcion2: string;
+  descripcion3: string;
   entero01: number;
   entero02: number;
   idEstado: number;

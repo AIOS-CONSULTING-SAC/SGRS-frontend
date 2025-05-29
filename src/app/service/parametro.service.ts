@@ -4,7 +4,7 @@ import { environment } from '../../enviroments/environment';
 import { EmpresaTO, GuardarEmpresaRequest, ListadoEmpresasResponse } from '../models/empresa/empresa.interface';
 import { Observable } from 'rxjs';
 import { ApiResponse, ApiResponseCrud } from '../models/respuesta';
-import { ListadoParametrosResponse, ParametroResponse } from '../models/parametro/parametro.interface';
+import { GuardarParametroRequest, ListadoParametrosResponse, ParametroResponse } from '../models/parametro/parametro.interface';
 
  const apiServicio = 'api/v1/parametros/'
 @Injectable({
@@ -14,26 +14,33 @@ export class ParametroService {
   constructor(private http: HttpService) { 
   }
 
-  listado(codModulo?: string, codOpcion?: string, codPrefijo?: string, int01?: number, int02?: number): Observable<ApiResponse<ParametroResponse[]>> {
+  listado(codModulo?: string, codOpcion?: string, codPrefijo?: string, 
+    desc1?: string, desc2?: string, desc3?: string, 
+    int01?: number, int02?: number, int03?: string, idEstado?: string): Observable<ApiResponse<ParametroResponse[]>> {
     let url =apiServicio + `listar?`
     if (codModulo) url += `codModulo=${codModulo}`
     if (codOpcion) url += `&codOpcion=${codOpcion}`
     if (codPrefijo) url += `&codPrefijo=${codPrefijo}`
-    if (int01) url += `&int01=${int01}`
-    if (int02) url += `&int02=${int02}`
+    if (desc1) url += `&desc1=${desc1}`
+    if (desc2) url += `&desc2=${desc2}`
+    if (desc3) url += `&desc3=${desc3}`
+    if (int01) url += `&int02=${int01}`
+    if (int02) url += `&int01=${int02}`
+    if (int03) url += `&int02=${int03}`
+    if (idEstado) url += `&idEstado=${idEstado}`
     return this.http.obtenerQueryGet<ListadoParametrosResponse>(url)
   }
  
-  actualizar(request: GuardarEmpresaRequest) {
+  actualizar(request: GuardarParametroRequest) {
     return this.http.obtenerQueryPut(apiServicio, + 'actualizar', request)
   }
 
-  registrar(request: GuardarEmpresaRequest): Observable<ApiResponseCrud> {
+  registrar(request: GuardarParametroRequest): Observable<ApiResponseCrud> {
     return this.http.obtenerQueryPost<any>(apiServicio + 'guardar', request)
   }
 
-  eliminar(idEmpresa: number, usuarioSesion:number) {
-    let url = apiServicio + `eliminar?idEmpresa=${idEmpresa}&usuarioSesion=${usuarioSesion}`
+  eliminar(idParametro: number, usuarioSesion:number) {
+    let url = apiServicio + `eliminar?idParametro=${idParametro}&usuarioSesion=${usuarioSesion}`
     return this.http.obtenerQueryDelete<any>(url)
   }
 }

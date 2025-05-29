@@ -3,24 +3,18 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div>
       <label class="block text-sm font-medium text-slate-700 mb-1">Tipo Usuario</label>
-      <p-dropdown placeholder="Especifique tipo usuario" [options]="[
-            {label: 'Interno', value: '1'},
-            {label: 'Externo', value: '2'}
-          ]" [(ngModel)]="tipoUsuario" class="w-full" />
+      <p-dropdown placeholder="Especifique tipo usuario" [options]="tipoUsuario" [(ngModel)]="idTipoUsuario"
+        optionLabel="descripcion1" optionValue="correlativo" class="w-full" (ngModelChange)="cambiarTipoUsuario()" />
     </div>
-    <div *ngIf="tipoUsuario=='2'">
+    <div *ngIf="idTipoUsuario=='1'">
       <label class="block text-sm font-medium text-slate-700 mb-1">Empresa</label>
-      <p-dropdown placeholder="Especifique empresa" [options]="[
-            {label: 'FortiClient', value: '1'},
-            {label: 'Galaxy Bis', value: '2'}
-          ]" [(ngModel)]="empresa" class="w-full" />
+      <p-dropdown placeholder="Especifique empresa" [options]="empresas" optionLabel="nombreComercial"
+        optionValue="cliente" [autoDisplayFirst]="false" [(ngModel)]="empresa" class="w-full" />
     </div>
-    <div *ngIf="tipoUsuario=='1'">
+    <div *ngIf="idTipoUsuario=='2'">
       <label class="block text-sm font-medium text-slate-700 mb-1">Rol</label>
-      <p-dropdown placeholder="Especifique Rol" [autoDisplayFirst]="false" [options]="[
-            {label: 'Administrador' , value:'1'},
-            {label: 'Consulta', value: '2'}
-          ]" [(ngModel)]="rol" class="w-full" />
+      <p-dropdown placeholder="Especifique Rol" [autoDisplayFirst]="false" [options]="tipoPerfil"
+        [(ngModel)]="idTipoPerfil" class="w-full" optionLabel="descripcion1" optionValue="correlativo" />
     </div>
     <div>
       <label class="block text-sm font-medium text-slate-700 mb-1">Nro. documento</label>
@@ -30,7 +24,7 @@
   <div class="grid grid-cols-12 gap-4 mb-6">
     <div class="col-span-12 md:col-span-8">
       <label class="block text-sm font-medium text-slate-700 mb-1">Nombres</label>
-      <input pInputText [(ngModel)]="ruc" placeholder="Ingrese nombres" class="w-full" />
+      <input pInputText [(ngModel)]="nombres" placeholder="Ingrese nombres" class="w-full" />
     </div>
     <div class="col-span-12 md:col-span-4">
       <label class="block text-sm font-medium text-slate-700 mb-1">Estado</label>
@@ -56,9 +50,9 @@
     <ng-template pTemplate="header">
       <tr>
         <th>#</th>
-        <th>Empresa</th>
-        <th>Tipo usuario</th>
-        <th>Rol</th>
+        <th *ngIf="idTipoUsuario=='1'">Empresa</th>
+        
+        <th *ngIf="idTipoUsuario=='2'">Rol</th>
         <th>Nombres</th>
         <th>Nro. documento</th>
         <th>Estado</th>
@@ -68,16 +62,16 @@
     <ng-template pTemplate="body" let-usuario let-i="rowIndex">
       <tr>
         <td>{{ i + 1 }}</td>
-        <td>{{ usuario.descCliente }}</td>
-        <td>{{ usuario.descTipoUser }}</td>
-        <td>{{ usuario.descPerfil }}</td>
+        <td *ngIf="idTipoUsuario=='1'">{{ usuario.descCliente }}</td>
+        
+        <td *ngIf="idTipoUsuario=='2'">{{ usuario.descPerfil }}</td>
         <td>{{ usuario.nombre +' '+ usuario.apellidoP +' '+ usuario.apellidoM}}</td>
         <td>{{ usuario.ndoc }}</td>
         <td>{{ usuario.descEstado }}</td>
-        <td> 
-            <button pButton icon="pi pi-pencil" size="small" (click)="editar.emit(usuario)" severity="contrast"
+        <td>
+          <button pButton icon="pi pi-pencil" size="small" (click)="editar.emit(usuario)" severity="contrast"
             class="p-button-text"></button>
-          <button pButton icon="pi pi-trash" size="small"  *ngIf="usuario.idEstado==1" (click)="eliminar(usuario)"
+          <button pButton icon="pi pi-trash" size="small" *ngIf="usuario.idEstado==1" (click)="eliminar(usuario)"
             class="p-button-text" severity="danger"></button>
         </td>
       </tr>

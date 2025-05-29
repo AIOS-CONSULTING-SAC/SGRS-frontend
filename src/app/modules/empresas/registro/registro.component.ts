@@ -122,7 +122,7 @@ export class RegistroComponent {
     this.loading = true
     this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
       PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
-      PARAMETROS.MANTENIMIENTO.EMPRESAS.PROVINCIAS, idDepartamento).pipe(
+      PARAMETROS.MANTENIMIENTO.EMPRESAS.PROVINCIAS, "","","",idDepartamento).pipe(
       catchError(error => {
         this.mensajeToast.errorServicioConsulta(error);
         return EMPTY;
@@ -140,7 +140,7 @@ export class RegistroComponent {
     this.loading = true
     this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
       PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
-      PARAMETROS.MANTENIMIENTO.EMPRESAS.DISTRITOS, idDepartamento, idProvincia).pipe(
+      PARAMETROS.MANTENIMIENTO.EMPRESAS.DISTRITOS,"","","", idDepartamento, idProvincia).pipe(
       catchError(error => {
         this.mensajeToast.errorServicioConsulta(error);
         return EMPTY;

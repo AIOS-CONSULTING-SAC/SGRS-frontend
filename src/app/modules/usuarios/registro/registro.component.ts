@@ -120,8 +120,6 @@ export class RegistroComponent {
     }
   }
 
-
-
   cargarTipoUsuario(): void {
     this.loading = true
     this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
@@ -138,6 +136,25 @@ export class RegistroComponent {
           this.tipoUsuario = [];
         }
       });
+  }
+
+  cargarPerfiles(): void {
+    this.loading = true
+
+    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO, 
+      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS, 
+    PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL).pipe(
+      catchError(error => {
+        this.mensajeToast.errorServicioConsulta(error);
+        return EMPTY;
+      }), finalize(() => { this.loading = false })
+    ).subscribe(response => {
+      if (response.codigo === 0) {
+        this.tipoPerfil = response.respuesta;
+      } else {
+        this.tipoPerfil = [];
+      }
+    });
   }
 
   cargarClientes() {
@@ -171,24 +188,7 @@ export class RegistroComponent {
     });
   }
 
-  cargarPerfiles(): void {
-    this.loading = true
-
-    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO, 
-      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS, 
-    PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL).pipe(
-      catchError(error => {
-        this.mensajeToast.errorServicioConsulta(error);
-        return EMPTY;
-      }), finalize(() => { this.loading = false })
-    ).subscribe(response => {
-      if (response.codigo === 0) {
-        this.tipoPerfil = response.respuesta;
-      } else {
-        this.tipoPerfil = [];
-      }
-    });
-  }
+  
 
   request(): GuardarUsuarioRequest {
     return {

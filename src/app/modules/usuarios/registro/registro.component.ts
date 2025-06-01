@@ -51,16 +51,16 @@ export class RegistroComponent {
       usuario: [this.usuario?.usuario || null],
       idEmpresa: [this.usuario?.codEmpresa || '', Validators.required],
 
-      codTipoUser: [this.usuario?.codTipoUser || '', Validators.required],
+      codTipoUser: [this.usuario?.codTipoUser || '', [Validators.required]],
       codPerfil: [this.usuario?.codPerfil || null],
       codCliente: [this.usuario?.codCliente || null],
-      codTipoDoc: [this.usuario?.codTipoDoc || '', Validators.required],
-      ndoc: [this.usuario?.ndoc || '', Validators.required],
-      nombre: [this.usuario?.nombre || '', Validators.required],
-      apellidoP: [this.usuario?.apellidoP || '', Validators.required],
-      apellidoM: [this.usuario?.apellidoM || '', Validators.required],
-      telefono: [this.usuario?.telefono || ''],
-      correo: [this.usuario?.correo || '', [Validators.required, Validators.email]],
+      codTipoDoc: [this.usuario?.codTipoDoc || '', [Validators.required]],
+      ndoc: [this.usuario?.ndoc || '', [Validators.required, Validators.maxLength(15), Validators.pattern(/^[0-9]+$/)]],
+      nombre: [this.usuario?.nombre || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
+      apellidoP: [this.usuario?.apellidoP || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
+      apellidoM: [this.usuario?.apellidoM || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
+      telefono: [this.usuario?.telefono || '', [Validators.maxLength(20), Validators.pattern(/^[0-9]+$/)]],
+      correo: [this.usuario?.correo || '', [Validators.required, Validators.email, Validators.maxLength(100)]],
       idEstado: [this.usuario?.idEstado ?? 1],
       usuarioSesion: [this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? ''],
     });
@@ -122,7 +122,7 @@ export class RegistroComponent {
 
   cargarTipoUsuario(): void {
     this.loading = true
-    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
+    this.parametroService.listado(1,PARAMETROS.MODULOS.MANTENIMIENTO,
       PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
       PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_USUARIO).pipe(
         catchError(error => {
@@ -141,7 +141,7 @@ export class RegistroComponent {
   cargarPerfiles(): void {
     this.loading = true
 
-    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO, 
+    this.parametroService.listado(1,PARAMETROS.MODULOS.MANTENIMIENTO, 
       PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS, 
     PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL).pipe(
       catchError(error => {
@@ -174,7 +174,7 @@ export class RegistroComponent {
 
   cargarTipoDoc(): void {
     this.loading = true
-    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO, 
+    this.parametroService.listado(1,PARAMETROS.MODULOS.MANTENIMIENTO, 
       PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS, 
     PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_DOCUMENTO).pipe(
       catchError(error => {

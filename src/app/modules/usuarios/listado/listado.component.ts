@@ -66,7 +66,7 @@ export class ListadoComponent {
 
   private obtenerTipoUsuario() {
     return this.parametroService.listado(
-      PARAMETROS.MODULOS.MANTENIMIENTO,
+      1,PARAMETROS.MODULOS.MANTENIMIENTO,
       PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
       PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_USUARIO
     ).pipe(
@@ -79,7 +79,7 @@ export class ListadoComponent {
 
   private obtenerPerfiles() {
     return this.parametroService.listado(
-      PARAMETROS.MODULOS.MANTENIMIENTO,
+     1, PARAMETROS.MODULOS.MANTENIMIENTO,
       PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
       PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL
     ).pipe(

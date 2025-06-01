@@ -19,7 +19,7 @@ import { InputTextModule } from 'primeng/inputtext';
         class="w-full"
       />
       <small *ngIf="formHelper?.esCampoInvalido(controlName)" class="p-error">
-        {{ formHelper?.obtenerMensajeErrorDefecto() }}
+        {{ formHelper?.obtenerMensajeError(formGroup.get(controlName), controlName) }}
       </small>
     </div>
   `

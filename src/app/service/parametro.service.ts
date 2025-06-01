@@ -14,19 +14,19 @@ export class ParametroService {
   constructor(private http: HttpService) { 
   }
 
-  listado(codModulo?: string, codOpcion?: string, codPrefijo?: string, 
+  listado(tipoSQL: number, codModulo?: string, codOpcion?: string, codPrefijo?: string, 
     desc1?: string, desc2?: string, desc3?: string, 
-    int01?: number, int02?: number, int03?: string, idEstado?: string): Observable<ApiResponse<ParametroResponse[]>> {
+    int01?: number, int02?: number, idEstado?: string): Observable<ApiResponse<ParametroResponse[]>> {
     let url =apiServicio + `listar?`
-    if (codModulo) url += `codModulo=${codModulo}`
+    if (tipoSQL) url += `tipoSQL=${tipoSQL}`
+    if (codModulo) url += `&codModulo=${codModulo}`
     if (codOpcion) url += `&codOpcion=${codOpcion}`
     if (codPrefijo) url += `&codPrefijo=${codPrefijo}`
     if (desc1) url += `&desc1=${desc1}`
     if (desc2) url += `&desc2=${desc2}`
-    if (desc3) url += `&desc3=${desc3}`
-    if (int01) url += `&int02=${int01}`
-    if (int02) url += `&int01=${int02}`
-    if (int03) url += `&int02=${int03}`
+    if (desc3) url += `&desc3=${desc3}` 
+    if (int01) url += `&int01=${int01}`
+    if (int02) url += `&int02=${int02}`
     if (idEstado) url += `&idEstado=${idEstado}`
     return this.http.obtenerQueryGet<ListadoParametrosResponse>(url)
   }

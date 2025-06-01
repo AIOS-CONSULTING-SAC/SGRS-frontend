@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
@@ -13,6 +13,7 @@ import { ParametroService } from '../../../service/parametro.service';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { AutenticacionService } from '../../../auth/autenticacion.service';
 import { ActivatedRoute, Data } from '@angular/router';
+import { PARAMETROS } from '../../../shared/sistema-enums';
 @Component({
   selector: 'app-listado',
   imports: [FormsModule, TableModule, DropdownModule, ButtonModule, InputTextModule, CommonModule, ConfirmDialogModule],
@@ -23,7 +24,7 @@ import { ActivatedRoute, Data } from '@angular/router';
 export class ListadoComponent implements OnInit {
   tituloComponente = '';
 
-  @Output() registrar = new EventEmitter();
+  @Output() registrar = new EventEmitter<ParametroResponse[]>();
   @Output() editar = new EventEmitter<ParametroResponse>();
   parametros: ParametroResponse[] = [];
   loading = false;
@@ -37,20 +38,11 @@ export class ListadoComponent implements OnInit {
   idEstado?: string;
 
   // Combos
-  modulos = [
-    { label: 'Módulo A', value: 'MOD1' },
-    { label: 'Módulo B', value: 'MOD2' }
-  ];
+  @Input() modulos: ParametroResponse[] = [];
 
-  opciones = [
-    { label: 'Opción X', value: 'OPX' },
-    { label: 'Opción Y', value: 'OPY' }
-  ];
+  opciones: ParametroResponse[] = [];
 
-  prefijos = [
-    { label: 'Pre 1', value: 'PRE1' },
-    { label: 'Pre 2', value: 'PRE2' }
-  ];
+  prefijos: ParametroResponse[] = [];
 
   estados = [
     { label: 'Activo', value: '1' },
@@ -68,14 +60,15 @@ export class ListadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.data.subscribe((data: Data) => {
-          this.tituloComponente = data['breadcrumb']
-        })
+      this.tituloComponente = data['breadcrumb']
+    })
+  
   }
 
   buscar() {
     this.loading = true;
     this.parametroService
-      .listado(
+      .listado(1,
         this.codModulo,
         this.codOpcion,
         this.codPrefijo,
@@ -83,8 +76,7 @@ export class ListadoComponent implements OnInit {
         this.desc2,
         undefined, // desc3
         undefined, // int01
-        undefined, // int02
-        undefined, // int03
+        undefined, // int02 
         this.idEstado
       ).pipe(
         catchError((errorResponse: any) => {
@@ -100,6 +92,39 @@ export class ListadoComponent implements OnInit {
       });
   }
 
+  cambiarModulo() {
+
+    this.loading = true
+    this.parametroService.listado(3, this.codModulo).pipe(
+      catchError(error => {
+        this.mensajeService.errorServicioConsulta(error);
+        return EMPTY;
+      }), finalize(() => { this.loading = false })
+    ).subscribe(response => {
+      if (response.codigo === 0) {
+        this.opciones = response.respuesta;
+      } else {
+        this.opciones = [];
+      }
+    });
+  }
+
+  cambiarOpcion() {
+    this.loading = true
+    this.parametroService.listado(4, this.codModulo, this.codOpcion).pipe(
+      catchError(error => {
+        this.mensajeService.errorServicioConsulta(error);
+        return EMPTY;
+      }), finalize(() => { this.loading = false })
+    ).subscribe(response => {
+      if (response.codigo === 0) {
+        this.prefijos = response.respuesta;
+      } else {
+        this.prefijos = [];
+      }
+    });
+  }
+
   limpiar() {
     this.codModulo = undefined;
     this.codOpcion = undefined;
@@ -110,40 +135,40 @@ export class ListadoComponent implements OnInit {
     this.parametros = [];
   }
 
-   eliminar(parametro: ParametroResponse) {
-      console.log(parametro);
-      this.confirmationService.confirm({
+  eliminar(parametro: ParametroResponse) {
+    console.log(parametro);
+    this.confirmationService.confirm({
 
-        message: '¿Está seguro que desea desactivar el parámetro <b>' + parametro.descripcion1 + '</b> ? <br /><br />Podrá reactivar en cualquier momento.',
-        header: 'Eliminar parámetro',
-        rejectLabel: 'Cancelar',
-        rejectButtonProps: {
-          label: 'Cancelar',
-          severity: 'secondary',
-          outlined: true,
-        },
-        acceptButtonProps: {
-          label: 'Confirmar',
-          severity: 'danger',
-        },
-  
-        accept: () => {
-           this.parametroService
-            .eliminar(parametro.parametro, this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0)
-            .pipe(finalize(() => this.buscar()))
-            .subscribe({
-              next: (res) => {
-                if (res.codigo === 0) {
-                  this.mensajeService.exito('Éxito','Se desactivó el parámetro correctamente');
-                } else {
-                  this.mensajeService.error('Error',res.mensaje || 'Error al eliminar');
-                }
-              },
-              error: (err) => this.mensajeService.errorServicioGuardado(err)
-            });
-        }, 
-      });
-    }
-   
+      message: '¿Está seguro que desea desactivar el parámetro <b>' + parametro.descripcion1 + '</b> ? <br /><br />Podrá reactivar en cualquier momento.',
+      header: 'Eliminar parámetro',
+      rejectLabel: 'Cancelar',
+      rejectButtonProps: {
+        label: 'Cancelar',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Confirmar',
+        severity: 'danger',
+      },
+
+      accept: () => {
+        this.parametroService
+          .eliminar(parametro.parametro, this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0)
+          .pipe(finalize(() => this.buscar()))
+          .subscribe({
+            next: (res) => {
+              if (res.codigo === 0) {
+                this.mensajeService.exito('Éxito', 'Se desactivó el parámetro correctamente');
+              } else {
+                this.mensajeService.error('Error', res.mensaje || 'Error al eliminar');
+              }
+            },
+            error: (err) => this.mensajeService.errorServicioGuardado(err)
+          });
+      },
+    });
+  }
+
 
 }

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { EmpresaTO, GuardarEmpresaRequest } from '../../../models/empresa/empresa.interface';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
@@ -18,6 +18,7 @@ import { ClienteResponse, GuardarClienteRequest } from '../../../models/cliente/
 import { AutenticacionService } from '../../../auth/autenticacion.service';
 import { LoadingComponent } from '../../../shared/loading/loading.component';
 import { PARAMETROS } from '../../../shared/sistema-enums';
+import { rucValidator } from '../../../shared/ruc-validator';
 
 @Component({
   selector: 'app-registro',
@@ -43,18 +44,23 @@ export class RegistroComponent {
     this.form = this.fb.group({
       codEmpresa: [this.cliente?.codEmpresa || '', Validators.required],
       cliente: [this.cliente?.cliente || '', Validators.required],
-      ruc: [this.cliente?.ruc || '', Validators.required],
-      razonSocial: [this.cliente?.razonSocial || '', Validators.required],
-      nombreComercial: [this.cliente?.nombreComercial || '', Validators.required],
+      ruc: [this.cliente?.ruc || '', [
+        Validators.required,
+        Validators.maxLength(15),
+        rucValidator
+      ]],
+      razonSocial: [this.cliente?.razonSocial || '', [Validators.required,  Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(100)]],
+      nombreComercial: [this.cliente?.nombreComercial || '', [Validators.required,  Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(100)]],
       idDepartamento: ['', Validators.required],
       idProvincia: ['', Validators.required],
       idDistrito: ['', Validators.required],
-      direccion: ['', Validators.required],
+      direccion: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/),Validators.maxLength(400)]],
       idEstado: [''],
       usuarioSesion: [this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? ''],
     });
 
   }
+
 
   ngOnInit() {
     this.formHelper = new FormHelper(this.form);
@@ -102,56 +108,56 @@ export class RegistroComponent {
     this.cargarDistritos(idDepartamento, idProvincia)
   }
   cargarDepartamentos(): void {
-    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
-      PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS, 
+    this.parametroService.listado(1, PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
       PARAMETROS.MANTENIMIENTO.EMPRESAS.DEPARTAMENTOS).pipe(
-      catchError(error => {
-        this.mensajeToast.errorServicioConsulta(error);
-        return EMPTY;
-      })
-    ).subscribe(response => {
-      if (response.codigo === 0) {
-        this.departamentos = response.respuesta;
-      } else {
-        this.departamentos = [];
-      }
-    });
+        catchError(error => {
+          this.mensajeToast.errorServicioConsulta(error);
+          return EMPTY;
+        })
+      ).subscribe(response => {
+        if (response.codigo === 0) {
+          this.departamentos = response.respuesta;
+        } else {
+          this.departamentos = [];
+        }
+      });
   }
 
   cargarProvincias(idDepartamento: number): void {
     this.loading = true
-    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
+    this.parametroService.listado(1, PARAMETROS.MODULOS.MANTENIMIENTO,
       PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
-      PARAMETROS.MANTENIMIENTO.EMPRESAS.PROVINCIAS, "","","",idDepartamento).pipe(
-      catchError(error => {
-        this.mensajeToast.errorServicioConsulta(error);
-        return EMPTY;
-      }), finalize(() => { this.loading = false })
-    ).subscribe(response => {
-      if (response.codigo === 0) {
-        this.provincias = response.respuesta;
-      } else {
-        this.provincias = [];
-      }
-    });
+      PARAMETROS.MANTENIMIENTO.EMPRESAS.PROVINCIAS, "", "", "", idDepartamento).pipe(
+        catchError(error => {
+          this.mensajeToast.errorServicioConsulta(error);
+          return EMPTY;
+        }), finalize(() => { this.loading = false })
+      ).subscribe(response => {
+        if (response.codigo === 0) {
+          this.provincias = response.respuesta;
+        } else {
+          this.provincias = [];
+        }
+      });
   }
 
   cargarDistritos(idDepartamento: number, idProvincia: number): void {
     this.loading = true
-    this.parametroService.listado(PARAMETROS.MODULOS.MANTENIMIENTO,
+    this.parametroService.listado(1, PARAMETROS.MODULOS.MANTENIMIENTO,
       PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
-      PARAMETROS.MANTENIMIENTO.EMPRESAS.DISTRITOS,"","","", idDepartamento, idProvincia).pipe(
-      catchError(error => {
-        this.mensajeToast.errorServicioConsulta(error);
-        return EMPTY;
-      }), finalize(() => { this.loading = false })
-    ).subscribe(response => {
-      if (response.codigo === 0) {
-        this.distritos = response.respuesta;
-      } else {
-        this.distritos = [];
-      }
-    });
+      PARAMETROS.MANTENIMIENTO.EMPRESAS.DISTRITOS, "", "", "", idDepartamento, idProvincia).pipe(
+        catchError(error => {
+          this.mensajeToast.errorServicioConsulta(error);
+          return EMPTY;
+        }), finalize(() => { this.loading = false })
+      ).subscribe(response => {
+        if (response.codigo === 0) {
+          this.distritos = response.respuesta;
+        } else {
+          this.distritos = [];
+        }
+      });
   }
 
 
@@ -159,8 +165,8 @@ export class RegistroComponent {
     console.log(this.cliente)
     return {
       codEmpresa: this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0,
-      cliente: this.cliente.cliente,
-      ruc: this.cliente.ruc,
+      cliente: this.form.get('cliente').value ?? null,
+      ruc: this.form.get('ruc').value,
       razonSocial: this.form.get('razonSocial').value,
       nombreComercial: this.form.get('nombreComercial').value,
       direccion: this.form.get('direccion').value,

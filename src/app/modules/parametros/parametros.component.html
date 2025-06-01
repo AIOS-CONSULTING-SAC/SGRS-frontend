@@ -1,6 +1,6 @@
 <ng-container *ngIf="mostrarListado(); else formulario">
-  <app-listado (registrar)="abrirRegistro()" (editar)="editarParametro($event)"></app-listado>
+  <app-listado (registrar)="abrirRegistro()" [modulos]="modulos" (editar)="editarParametro($event)"></app-listado>
 </ng-container>
 <ng-template #formulario>
-  <app-registro [parametro]="parametroSeleccionado()" (volver)="volverAlListado()"></app-registro>
+  <app-registro [parametro]="parametroSeleccionado()" [modulos]="modulos" (volver)="volverAlListado()"></app-registro>
 </ng-template>

@@ -4,17 +4,19 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div>
       <label class="block text-sm font-medium text-slate-700 mb-1">Módulo</label>
-      <p-dropdown [options]="modulos" optionLabel="label" optionValue="value"
+      <p-dropdown [options]="modulos" optionLabel="descModulo" optionValue="codModulo"
+      (ngModelChange)="cambiarModulo()"
         placeholder="Seleccione módulo" [(ngModel)]="codModulo" class="w-full" />
     </div>
     <div>
       <label class="block text-sm font-medium text-slate-700 mb-1">Opción</label>
-      <p-dropdown [options]="opciones" optionLabel="label" optionValue="value"
+      <p-dropdown [options]="opciones" optionLabel="descOpcion" optionValue="codOpcion"
+      (onChange)="cambiarOpcion()"
         placeholder="Seleccione opción" [(ngModel)]="codOpcion" class="w-full" />
     </div>
     <div>
       <label class="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
-      <p-dropdown [options]="prefijos" optionLabel="label" optionValue="value"
+      <p-dropdown [options]="prefijos" optionLabel="descripcion1" optionValue="prefijo"
         placeholder="Seleccione tipo" [(ngModel)]="codPrefijo" class="w-full" />
     </div>
     <div>
@@ -42,8 +44,7 @@
       <tr>
         <th>#</th>
         <th>Módulo</th>
-        <th>Opción</th>
-        <th>Prefijo</th>
+        <th>Opción</th> 
         <th>Descripción 1</th> 
         <th>Estado</th>
         <th>Acciones</th>
@@ -53,8 +54,7 @@
       <tr>
         <td>{{ i + 1 }}</td>
         <td>{{ parametro.descModulo }}</td>
-        <td>{{ parametro.descOpcion }}</td>
-        <td>{{ parametro.descPrefijo }}</td>
+        <td>{{ parametro.descOpcion }}</td> 
         <td>{{ parametro.descripcion1 }}</td> 
         <td>{{ parametro.descEstado }}</td>
         <td>

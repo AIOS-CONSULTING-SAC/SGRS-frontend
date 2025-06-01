@@ -28,12 +28,12 @@ export interface GuardarParametroRequest {
   codOpcion: number;
   descOpcion: string;
   prefijo: number;
-  correlativo: number;
-  desc01: string;
-  desc02: string;
-  desc03: string;
-  int01: number;
-  int02: number;
+  correlativo: number | null;
+  desc01: string | null;
+  desc02: string | null;
+  desc03: string | null;
+  int01: number | null;
+  int02: number | null;
   idEstado: number;
   usuarioSesion: number;
 }

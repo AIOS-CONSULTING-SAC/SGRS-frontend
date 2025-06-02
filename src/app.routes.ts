@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
-import { AppLayout } from './app/layout/component/app.layout';
-import { Dashboard } from './app/pages/dashboard/dashboard';
+import { AppLayout } from './app/layout/component/app.layout'; 
 import { Documentation } from './app/pages/documentation/documentation';
 import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
@@ -9,6 +8,7 @@ import { EmpresasComponent } from './app/modules/empresas/empresas.component';
 import { UsuariosComponent } from './app/modules/usuarios/usuarios.component';
 import { AuthGuard } from './app/auth/auth.guard';
 import { ParametrosComponent } from './app/modules/parametros/parametros.component';
+import { DashboardComponent } from './app/modules/dashboard/dashboard.component';
 
 export const appRoutes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -18,8 +18,8 @@ export const appRoutes: Routes = [
         component: AppLayout,
         canActivate: [AuthGuard],
         children: [
-            { path: 'dashboard', component: Dashboard },
-            { path: 'empresa', data: { breadcrumb: 'Mantenimiento > Empresas' }, component:EmpresasComponent},
+            { path: 'dashboard', component: DashboardComponent, data: { breadcrumb: 'Dashboard' } },
+            { path: 'empresa', data: { breadcrumb: 'Mantenimiento > Empresas' }, component: EmpresasComponent },
             { path: 'usuario', data: { breadcrumb: 'Mantenimiento > Usuarios' }, component: UsuariosComponent },
             { path: 'parametro', data: { breadcrumb: 'Mantenimiento > Parametros' }, component: ParametrosComponent },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

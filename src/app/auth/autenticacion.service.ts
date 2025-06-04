@@ -122,6 +122,14 @@ export class AutenticacionService {
     return null
   }
 
+   obtenerCodTipoUsuario(): number | null {
+    const tokenPayload = this.decodeToken()
+    if (tokenPayload) {
+      return tokenPayload.tipoUsuario
+    }
+    return null
+  }
+
   getDatosToken() {
     const token = localStorage.getItem('accessToken')
 
@@ -141,7 +149,7 @@ type TokenPayload = {
   codigoRol: number
   codigoEmpresa: number
   codigoUsuario: number
-  tipoUsuario: string
+  tipoUsuario: number
   nombres: string
   apellidos: string
 }

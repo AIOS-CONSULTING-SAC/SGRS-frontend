@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
+import { AutenticacionService } from '../../auth/autenticacion.service';
 
 @Component({
     selector: 'app-menu',
@@ -16,24 +17,42 @@ import { AppMenuitem } from './app.menuitem';
     </ul> `
 })
 export class AppMenu {
+
+    constructor(private autenticacionService: AutenticacionService) {
+
+    }
     model: MenuItem[] = [];
 
     ngOnInit() {
-        this.model = [
-            {
-                items:[
-                    {label: 'Dashboard', icon: '', routerLink: ['/dashboard']},
-                    {label: 'Gestión de Residuos', icon: '', routerLink: ['/uikit/input']},
-                    {label: 'Mantenimiento',
-                        items: [
-                           
-                            { label: 'Empresa', icon: '', routerLink: ['/empresa'] },
-                            { label: 'Usuarios', icon: '', routerLink: ['/usuario'] }, 
-                            { label: 'Parametro', icon: '', routerLink: ['/parametro'] },  
-                        ]}
-                ]
-            }
-
-        ];
+        const codPerfil = this.autenticacionService.obtenerCodTipoUsuario(); // o desde tu servicio
+        console.log(codPerfil)
+        if (codPerfil == 1) {
+            // Solo Dashboard
+            this.model = [
+                {
+                    items: [
+                        { label: 'Dashboard', icon: '', routerLink: ['/dashboard'] }
+                    ]
+                }
+            ];
+        } else {
+            // Menú completo
+            this.model = [
+                {
+                    items: [
+                        { label: 'Dashboard', icon: '', routerLink: ['/dashboard'] },
+                        { label: 'Gestión de Residuos', icon: '', routerLink: ['/uikit/input'] },
+                        {
+                            label: 'Mantenimiento',
+                            items: [
+                                { label: 'Empresa', icon: '', routerLink: ['/empresa'] },
+                                { label: 'Usuarios', icon: '', routerLink: ['/usuario'] },
+                                { label: 'Parametro', icon: '', routerLink: ['/parametro'] }
+                            ]
+                        }
+                    ]
+                }
+            ];
+        }
     }
 }

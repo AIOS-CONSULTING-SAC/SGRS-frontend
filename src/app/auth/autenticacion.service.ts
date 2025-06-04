@@ -93,7 +93,7 @@ export class AutenticacionService {
   obtenerNombresApe(): string {
     const tokenPayload = this.decodeToken()
     if (tokenPayload) {
-      return `${tokenPayload.nombres} ${tokenPayload.apellidos}`
+      return `${tokenPayload.nombres} ${tokenPayload.apellidosP} ${tokenPayload.apellidosM}`
     }
     return ''
   }
@@ -122,6 +122,14 @@ export class AutenticacionService {
     return null
   }
 
+  obtenerCodCliente(): number | null {
+    const tokenPayload = this.decodeToken()
+    if (tokenPayload) {
+      return tokenPayload.cliente
+    }
+    return null
+  }
+
    obtenerCodTipoUsuario(): number | null {
     const tokenPayload = this.decodeToken()
     if (tokenPayload) {
@@ -146,10 +154,12 @@ export class AutenticacionService {
 }
 
 type TokenPayload = {
-  codigoRol: number
   codigoEmpresa: number
+  cliente: number
+  codigoRol: number
   codigoUsuario: number
   tipoUsuario: number
   nombres: string
-  apellidos: string
+  apellidosP: string
+  apellidosM: string
 }

@@ -29,9 +29,7 @@ export class AppMenu {
                            
                             { label: 'Empresa', icon: '', routerLink: ['/empresa'] },
                             { label: 'Usuarios', icon: '', routerLink: ['/usuario'] }, 
-                            { label: 'Parametro', icon: '', routerLink: ['/parametro'] }, 
-                            { label: 'Residuos', icon: '', routerLink: ['/uikit/input'] }, 
-                            { label: 'PTAR', icon: '', routerLink: ['/uikit/input'] }, 
+                            { label: 'Parametro', icon: '', routerLink: ['/parametro'] },  
                         ]}
                 ]
             }

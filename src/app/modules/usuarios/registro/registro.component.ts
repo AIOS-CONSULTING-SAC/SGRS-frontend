@@ -222,6 +222,7 @@ export class RegistroComponent {
       const { respuesta, codigo, mensaje } = response;
       if (codigo === 0 && respuesta == '200') {
         this.mensajeToast.exito('Éxito', mensaje)
+        this.volver.emit();
       } else {
         this.mensajeToast.error('Error', mensaje)
       }

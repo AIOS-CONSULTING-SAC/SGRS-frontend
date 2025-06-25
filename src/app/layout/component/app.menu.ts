@@ -26,7 +26,7 @@ export class AppMenu {
     ngOnInit() {
         const codPerfil = this.autenticacionService.obtenerCodTipoUsuario(); // o desde tu servicio
         console.log(codPerfil)
-        if (codPerfil == 1) {
+        if (codPerfil == 2) {
             // Solo Dashboard
             this.model = [
                 {
@@ -41,7 +41,7 @@ export class AppMenu {
                 {
                     items: [
                         { label: 'Dashboard', icon: '', routerLink: ['/dashboard'] },
-                        { label: 'Gestión de Residuos', icon: '', routerLink: ['/uikit/input'] },
+                        { label: 'Gestión de Residuos', icon: '', routerLink: ['/manejo-residuos'] },
                         {
                             label: 'Mantenimiento',
                             items: [

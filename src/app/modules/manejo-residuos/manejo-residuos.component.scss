@@ -1,0 +1,14 @@
+::ng-deep .tabla-residuos .p-datatable-thead > tr > th {
+  background-color: var(--secondary-color-isoseg) !important;
+  color: #ffffff; 
+  text-align: center;
+}
+::ng-deep .tabla-locales .p-datatable-tbody > tr > td {
+  text-align: center;
+}
+
+::ng-deep .tabla-locales .p-datatable-thead > tr > th {
+  background-color:var(--primary-color-isoseg);
+  color: #ffffff; 
+  text-align: center;
+}

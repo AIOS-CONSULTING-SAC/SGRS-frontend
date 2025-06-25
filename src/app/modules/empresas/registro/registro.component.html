@@ -7,22 +7,17 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">
-        RUC <small class="p-error">*</small>
-      </label>
-      <input
-        pInputText 
-        formControlName="ruc"
-        placeholder="Ingrese RUC"  
-        [class]="formHelper?.esClaseInvalido('ruc')"
-        class="w-full"
-      /> 
+          RUC <small class="p-error">*</small>
+        </label>
+        <input pInputText formControlName="ruc" placeholder="Ingrese RUC" [class]="formHelper?.esClaseInvalido('ruc')"
+          class="w-full" />
         <small *ngIf="form.get('ruc')?.errors?.['invalidRUC'] && form.get('ruc')?.touched" class="p-error">
           RUC inválido. Debe ser un RUC 10, RUC 20 o un código extranjero válido.
         </small>
         <small *ngIf="form.get('ruc')?.errors?.['required'] && form.get('ruc')?.touched" class="p-error">
-           {{ formHelper?.obtenerMensajeErrorDefecto() }}
+          {{ formHelper?.obtenerMensajeErrorDefecto() }}
         </small>
-        
+
       </div>
       <div>
         <app-form-input [formGroup]="form" controlName="razonSocial" label="Razón social"

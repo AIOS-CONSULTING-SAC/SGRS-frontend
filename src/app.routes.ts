@@ -9,6 +9,7 @@ import { UsuariosComponent } from './app/modules/usuarios/usuarios.component';
 import { AuthGuard } from './app/auth/auth.guard';
 import { ParametrosComponent } from './app/modules/parametros/parametros.component';
 import { DashboardComponent } from './app/modules/dashboard/dashboard.component';
+import { ManejoResiduosComponent } from './app/modules/manejo-residuos/manejo-residuos.component';
 
 export const appRoutes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ export const appRoutes: Routes = [
             { path: 'empresa', data: { breadcrumb: 'Mantenimiento > Empresas' }, component: EmpresasComponent },
             { path: 'usuario', data: { breadcrumb: 'Mantenimiento > Usuarios' }, component: UsuariosComponent },
             { path: 'parametro', data: { breadcrumb: 'Mantenimiento > Parametros' }, component: ParametrosComponent },
+            { path: 'manejo-residuos', data: { breadcrumb: 'Manejo de Residuos Sólidos' }, component: ManejoResiduosComponent },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },

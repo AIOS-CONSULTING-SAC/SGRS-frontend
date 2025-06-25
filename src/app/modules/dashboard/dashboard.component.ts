@@ -18,6 +18,7 @@ import { Chart } from 'chart.js';
 import 'chartjs-plugin-datalabels';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ListadoParametrosResponse } from '../../models/parametro/parametro.interface';
+import { AutenticacionService } from '../../auth/autenticacion.service';
 
 
 export interface FiltroResiduos {
@@ -56,6 +57,7 @@ export class DashboardComponent {
 
   constructor(private fb: FormBuilder, private localService: LocalService,
     private residuosService: ResiduoService,
+    private autenticacionService: AutenticacionService,
     private mensajeService: MensajesToastService,
     private parametroService: ParametroService) {
     this.setForm();
@@ -219,8 +221,8 @@ export class DashboardComponent {
         PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
         PARAMETROS.MANTENIMIENTO.EMPRESAS.ANIOS
       ),
-      locales: this.localService.listado(2, 1),
-      residuos: this.residuosService.listado(2, 1)
+      locales: this.localService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, 1),
+      residuos: this.residuosService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, 1)
     })
       .pipe(
         catchError(error => {

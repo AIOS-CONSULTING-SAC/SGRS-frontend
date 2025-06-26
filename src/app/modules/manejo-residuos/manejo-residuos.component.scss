@@ -1,14 +1,36 @@
-::ng-deep .tabla-residuos .p-datatable-thead > tr > th {
+::ng-deep .tabla-residuos .p-datatable-thead>tr>th {
   background-color: var(--secondary-color-isoseg) !important;
-  color: #ffffff; 
+  color: #ffffff;
   text-align: center;
+  overflow-x: auto;
 }
-::ng-deep .tabla-locales .p-datatable-tbody > tr > td {
+
+::ng-deep .tabla-locales .p-datatable-tbody>tr>td {
   text-align: center;
 }
 
-::ng-deep .tabla-locales .p-datatable-thead > tr > th {
-  background-color:var(--primary-color-isoseg);
-  color: #ffffff; 
+::ng-deep .tabla-locales .p-datatable-thead>tr>th {
+  background-color: var(--primary-color-isoseg);
+  color: #ffffff;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .tabla-locales {
+    font-size: 0.85rem;
+  }
+
+  .tabla-residuos th,
+  .tabla-residuos td {
+    padding: 0.25rem;
+  }
+
+  input.p-inputtext-sm {
+    font-size: 0.8rem;
+  }
+}
+
+::ng-deep .filtros-sidebar {
+  padding: 1rem;
+  border-radius: 0.75rem;
 }

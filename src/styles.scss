@@ -16,3 +16,14 @@
   width: 100% !important;
 }
 
+
+.p-column-title {
+  display: block;
+  font-weight: bold;
+}
+
+@media (min-width: 640px) {
+  .p-column-title {
+    display: none;
+  }
+}

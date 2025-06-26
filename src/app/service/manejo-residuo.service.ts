@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs'; 
 import { HttpService } from '../shared/http.service';
 import { ApiResponseCrud } from '../models/respuesta';
-import { GuardarResiduoRequest, ListadoLocalResiduosResponse, ListadoResiduosEmpresaResponse } from '../models/residuo/residuo.interface';
+import { GuardarManejoResiduoRequest, GuardarResiduoRequest, ListadoLocalResiduosResponse, ListadoResiduosEmpresaResponse } from '../models/residuo/residuo.interface';
 
 const apiServicio = 'api/v1/manejoresiduos/';
 
@@ -18,7 +18,7 @@ export class ManejoResiduoService {
     return this.http.obtenerQueryGet<ListadoLocalResiduosResponse>(url);
   }
 
-  registrar(request: GuardarResiduoRequest): Observable<ApiResponseCrud> {
+  registrar(request: GuardarManejoResiduoRequest): Observable<ApiResponseCrud> {
     return this.http.obtenerQueryPost<ApiResponseCrud>(apiServicio + 'guardar', request);
   }
 

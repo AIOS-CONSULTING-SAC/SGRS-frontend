@@ -55,3 +55,13 @@ export interface LocalGroup {
 }
 
 export type ListadoLocalResiduosResponse = ApiResponse<ManejoResiduoResponse[]>
+
+
+export interface GuardarManejoResiduoRequest {
+  codLocal: number;
+  codResiduo: number;
+  anio: number;
+  detalle: { mes: number; cantidad: number }[];
+  idEstado?: number;
+  usuarioSesion?: string;
+}

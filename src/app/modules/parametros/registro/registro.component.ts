@@ -48,8 +48,7 @@ export class RegistroComponent implements OnInit {
       desc03: [this.parametro?.descripcion3 || '', [Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(50)]],
       int01: [this.parametro?.entero01 || null, [Validators.pattern(/^[0-9]+$/), Validators.maxLength(11)]],
       int02: [this.parametro?.entero02 || null, [Validators.pattern(/^[0-9]+$/), Validators.maxLength(11)]],
-      idEstado: [this.parametro?.idEstado || 1, Validators.required],
-      usuarioSesion: [this.autenticacionService.getDatosToken()?.codigoUsuario.toString() || ''],
+      idEstado: [this.parametro?.idEstado || 1, Validators.required], 
     });
 
   }
@@ -163,8 +162,7 @@ export class RegistroComponent implements OnInit {
       desc03: formValues.desc03,
       int01: formValues.int01 || null,
       int02: formValues.int02 || null,
-      idEstado: formValues.idEstado ?? 1,
-      usuarioSesion: formValues.usuarioSesion
+      idEstado: formValues.idEstado ?? 1, 
     };
   
     return request;

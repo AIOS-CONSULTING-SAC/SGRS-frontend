@@ -34,7 +34,6 @@ export interface GuardarParametroRequest {
   desc03: string | null;
   int01: number | null;
   int02: number | null;
-  idEstado: number;
-  usuarioSesion: number;
+  idEstado: number; 
 }
 

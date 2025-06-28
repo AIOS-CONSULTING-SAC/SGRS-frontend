@@ -27,8 +27,8 @@ export class ResiduoService {
     return this.http.obtenerQueryPut<ApiResponseCrud>(apiServicio + 'actualizar', request);
   }
 
-  eliminar(idResiduo: number, usuarioSesion: number): Observable<ApiResponseCrud> {
-    const url = apiServicio + `eliminar?idResiduo=${idResiduo}&usuarioSesion=${usuarioSesion}`;
+  eliminar(idResiduo: number): Observable<ApiResponseCrud> {
+    const url = apiServicio + `eliminar?idResiduo=${idResiduo}`;
     return this.http.obtenerQueryDelete<ApiResponseCrud>(url);
   }
 }

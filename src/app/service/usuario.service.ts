@@ -37,8 +37,8 @@ export class UsuarioService {
     return this.http.obtenerQueryPut<ApiResponseCrud>(apiUsuario + 'actualizar', request);
   }
 
-  eliminar(idUsuario: number, usuarioSesion: number): Observable<ApiResponseCrud> {
-    const url = `${apiUsuario}eliminar?idUsuario=${idUsuario}&usuarioSesion=${usuarioSesion}`;
+  eliminar(idUsuario: number): Observable<ApiResponseCrud> {
+    const url = `${apiUsuario}eliminar?idUsuario=${idUsuario}`;
     return this.http.obtenerQueryDelete<ApiResponseCrud>(url);
   }
 }

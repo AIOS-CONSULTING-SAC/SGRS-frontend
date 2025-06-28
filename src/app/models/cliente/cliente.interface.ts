@@ -28,7 +28,6 @@ export interface GuardarClienteRequest {
 
   direccion: string;
   idEstado: number;
-  usuarioSesion: number;
   mensaje?: string;
 }
 

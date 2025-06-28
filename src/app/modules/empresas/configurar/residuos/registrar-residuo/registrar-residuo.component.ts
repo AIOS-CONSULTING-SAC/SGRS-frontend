@@ -49,8 +49,7 @@ export class RegistrarResiduoComponent implements OnInit {
       codCliente: [this.cliente?.cliente],
       descripcion: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/)]],
       idUnidad: [null, Validators.required],
-      idEstado: [1, Validators.required],
-      usuarioSesion: [this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? ''],
+      idEstado: [1, Validators.required], 
     });
   }
 
@@ -85,8 +84,7 @@ export class RegistrarResiduoComponent implements OnInit {
   guardar() {
     if (this.form.valid) {
 
-      const formValue: GuardarResiduoRequest = this.form.getRawValue();
-      formValue.usuarioSesion = this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0;
+      const formValue: GuardarResiduoRequest = this.form.getRawValue(); 
       const peticion = formValue.residuo
         ? this.residuosService.actualizar(formValue)
         : this.residuosService.registrar(formValue);

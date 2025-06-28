@@ -171,7 +171,7 @@ export class ListadoComponent {
       },
 
       accept: () => {
-        this.usuarioService.eliminar(usuario.usuario, this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0)
+        this.usuarioService.eliminar(usuario.usuario)
           .pipe(finalize(() => this.buscar()))
           .subscribe({
             next: (res) => {

@@ -77,8 +77,7 @@ export class ManejoResiduosComponent {
     
   }
 
-  guardar() {
-    const usuarioSesion = this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? '0';
+  guardar() { 
     const idEstado = 1;
     const anio = this.form.get('anio').value;
     const requests = Object.values(this.registrosModificados)
@@ -87,8 +86,7 @@ export class ManejoResiduosComponent {
         codResiduo: item.codResiduo,
         anio,
         detalle: item.detalle.filter(d => d.cantidad !== null && !isNaN(d.cantidad)),
-        idEstado,
-        usuarioSesion
+        idEstado, 
       }))
       .filter(req => req.detalle.length > 0);
 
@@ -222,11 +220,13 @@ export class ManejoResiduosComponent {
     this.listarLocales()
   }
 
+  
+
   listarLocales() {
     this.loading = true;
 
     forkJoin({
-      locales: this.localService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, 1)
+      locales: this.localService.listado(this.form.get('empresa').value, 1)
     })
       .pipe(
         catchError(error => {

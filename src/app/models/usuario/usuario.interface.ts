@@ -27,7 +27,7 @@ export type ListadoUsuarioResponse = ApiResponse<UsuarioResponse[]>
 export interface GuardarUsuarioRequest {
   idUsuario: number | null;
   idEmpresa: number;
-  idcliente: number;
+  idCliente: number;
   idTipoUser: number;
   idPerfil: number;
   idTipoDoc: number;
@@ -37,8 +37,7 @@ export interface GuardarUsuarioRequest {
   apellidoM: string;
   telefono: string;
   correo: string; 
-  idEstado: number; 
-  usuarioSesion: number;
+  idEstado: number;  
   mensaje?: string;
 }
 

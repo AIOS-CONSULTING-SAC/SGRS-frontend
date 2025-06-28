@@ -39,8 +39,8 @@ export class ParametroService {
     return this.http.obtenerQueryPost<any>(apiServicio + 'guardar', request)
   }
 
-  eliminar(idParametro: number, usuarioSesion:number) {
-    let url = apiServicio + `eliminar?idParametro=${idParametro}&usuarioSesion=${usuarioSesion}`
+  eliminar(idParametro: number) {
+    let url = apiServicio + `eliminar?idParametro=${idParametro}`
     return this.http.obtenerQueryDelete<any>(url)
   }
 }

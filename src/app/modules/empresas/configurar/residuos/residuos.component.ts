@@ -77,15 +77,13 @@ export class ResiduosComponent {
 
   registrar() {
     this.registrarResiduo.abrir('Registrar residuo', {
-      codCliente: this.cliente?.cliente,
-      usuarioSesion: this.autenticacionService.getDatosToken()?.codigoUsuario
+      codCliente: this.cliente?.cliente
     });
   }
 
   editar(residuo: ResiduoResponse) {
     this.registrarResiduo.abrir('Editar residuo', {
-      ...residuo,
-      usuarioSesion: this.autenticacionService.getDatosToken()?.codigoUsuario
+      ...residuo
     });
   }
 
@@ -105,7 +103,7 @@ export class ResiduosComponent {
       },
       accept: () => {
         this.residuosService
-          .eliminar(residuo.residuo, this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0)
+          .eliminar(residuo.residuo)
           .pipe(finalize(() => this.buscar()))
           .subscribe({
             next: (res) => {

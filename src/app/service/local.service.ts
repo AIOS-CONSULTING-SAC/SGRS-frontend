@@ -29,8 +29,8 @@ export class LocalService {
     return this.http.obtenerQueryPut<ApiResponseCrud>(apiServicio + 'actualizar', request);
   }
 
-  eliminar(idLocal: number, usuarioSesion: string): Observable<ApiResponseCrud> {
-    const url = apiServicio + `eliminar?idLocal=${idLocal}&usuarioSesion=${usuarioSesion}`;
+  eliminar(idLocal: number): Observable<ApiResponseCrud> {
+    const url = apiServicio + `eliminar?idLocal=${idLocal}`;
     return this.http.obtenerQueryDelete<ApiResponseCrud>(url);
   }
 }

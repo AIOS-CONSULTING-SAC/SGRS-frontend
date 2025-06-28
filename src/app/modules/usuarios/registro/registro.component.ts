@@ -61,8 +61,7 @@ export class RegistroComponent {
       apellidoM: [this.usuario?.apellidoM || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
       telefono: [this.usuario?.telefono || '', [Validators.maxLength(20), Validators.pattern(/^[0-9]+$/)]],
       correo: [this.usuario?.correo || '', [Validators.required, Validators.email, Validators.maxLength(100)]],
-      idEstado: [this.usuario?.idEstado ?? 1],
-      usuarioSesion: [this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? ''],
+      idEstado: [this.usuario?.idEstado ?? 1], 
     });
   }
 
@@ -194,7 +193,7 @@ export class RegistroComponent {
     return {
       idUsuario: this.form.get('usuario').value,
       idEmpresa: this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0,
-      idcliente: this.form.get('codCliente').value,
+      idCliente: this.form.get('codCliente').value,
       idTipoUser: this.form.get('codTipoUser').value,
       idPerfil: this.form.get('codPerfil').value,
 
@@ -206,8 +205,6 @@ export class RegistroComponent {
       telefono: this.form.get('telefono').value,
       correo: this.form.get('correo').value,
       idEstado: this.form.get('idEstado').value,
-
-      usuarioSesion: this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0
     };
   }
 

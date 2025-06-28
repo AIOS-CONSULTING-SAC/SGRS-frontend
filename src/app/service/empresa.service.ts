@@ -29,8 +29,8 @@ export class EmpresaService {
     return this.http.obtenerQueryPost<any>(apiServicio + 'guardar', request)
   }
 
-  eliminar(idEmpresa: number, usuarioSesion:number) {
-    let url = apiServicio + `eliminar?idEmpresa=${idEmpresa}&usuarioSesion=${usuarioSesion}`
+  eliminar(idEmpresa: number) {
+    let url = apiServicio + `eliminar?idEmpresa=${idEmpresa}`
     return this.http.obtenerQueryDelete<any>(url)
   }
 }

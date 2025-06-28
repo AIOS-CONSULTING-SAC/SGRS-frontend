@@ -12,13 +12,19 @@ import { ResiduoService } from '../../service/residuo.service';
 import { ListadoLocalesEmpresaResponse } from '../../models/local/local.interface';
 import { catchError, EMPTY, finalize, forkJoin, Observable } from 'rxjs';
 import { MensajesToastService } from '../../shared/mensajes-toast.service';
-import { ListadoResiduosEmpresaResponse } from '../../models/residuo/residuo.interface';
-import { TabView, TabPanel, TabViewModule } from 'primeng/tabview';
+import { TabViewModule } from 'primeng/tabview';
 import { Chart } from 'chart.js';
 import 'chartjs-plugin-datalabels';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { ListadoParametrosResponse } from '../../models/parametro/parametro.interface';
+import { ListadoParametrosResponse, ParametroResponse } from '../../models/parametro/parametro.interface';
 import { AutenticacionService } from '../../auth/autenticacion.service';
+import { DashboardService } from '../../service/dashboard.service';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ClienteResponse } from '../../models/cliente/cliente.interface';
+import { ClienteService } from '../../service/cliente.service';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { CardModule } from 'primeng/card';
+import { PanelModule } from 'primeng/panel';
 
 
 export interface FiltroResiduos {
@@ -26,6 +32,10 @@ export interface FiltroResiduos {
   mes?: number;
   idLocal?: number | string;
   idResiduoSolido?: number | string;
+}
+interface LocalAgrupado {
+  descLocal: string;
+  [residuo: string]: string | number;
 }
 
 export interface ResumenResiduos {
@@ -35,18 +45,19 @@ export interface ResumenResiduos {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ReactiveFormsModule, FormsModule, DropdownModule, ButtonModule, CommonModule, TabViewModule, ChartModule],
+  imports: [ReactiveFormsModule, FormsModule, DropdownModule,
+    ButtonModule, CommonModule, TabViewModule, ChartModule,
+    MultiSelectModule, ProgressBarModule, CardModule, PanelModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
   chartPlugins = [ChartDataLabels];
   filtroForm!: FormGroup;
-  anios: any[] = [];
-
+  empresas: ClienteResponse[] = [];
+  anios: ParametroResponse[] = [];
   meses: any[] = MESES;
-
-  locales: any[] = [];
+  localesFiltro: any[] = [];
   loading: boolean = false;
   dataResumen: ResumenResiduos[] = [];
   residuos: any[] = [];
@@ -54,23 +65,251 @@ export class DashboardComponent {
   chartLocalesOptions!: any;
   chartResiduosData: any;
   chartOptions: any;
-
+  idCliente: any;
+  idAnio: any
+  idMeses!: any;
+  idLocales!: any;
+  idResiduos!: any;
+  graficoResiduos!: any[]
+  chartData: any;
+  chartStackedOptions = {};
   constructor(private fb: FormBuilder, private localService: LocalService,
     private residuosService: ResiduoService,
     private autenticacionService: AutenticacionService,
     private mensajeService: MensajesToastService,
+    private clienteService: ClienteService,
+    private dashboardService: DashboardService,
     private parametroService: ParametroService) {
-    this.setForm();
     Chart.register(ChartDataLabels);
+
   }
 
-  setForm() {
-    this.filtroForm = this.fb.group({
-      anio: [null, Validators.required],
-      mes: [null],
-      idLocal: [null],
-      idResiduoSolido: [null]
-    });
+   cambiarCliente() {
+    this.listarLocales()
+  }
+
+  listarLocales() {
+    this.loading = true;
+
+    forkJoin({
+      locales: this.localService.listado(this.obtenerCodCliente(), 1),
+       residuos: this.residuosService.listado(this.obtenerCodCliente(), 1),
+    })
+      .pipe(
+        catchError(error => {
+          this.mensajeService.errorServicioConsulta(error);
+          return EMPTY;
+        }),
+        finalize(() => this.loading = false)
+      )
+      .subscribe(({ locales, residuos }) => {
+
+        this.localesFiltro = locales.codigo === 0 ? locales.respuesta : [];
+        this.residuos = residuos.codigo === 0 ? residuos.respuesta : [];
+        this.idLocales = []
+        this.idResiduos = []
+      });
+  }
+
+  obtenerCodCliente(){
+    return this.esCliente() ? this.autenticacionService.getDatosToken()?.cliente || 0 : this.idCliente;
+  }
+
+
+
+  listarGraficoBarra() {
+    this.dashboardService.listarGraficoBarra(
+      this.obtenerCodCliente(),
+      this.idAnio || 0,
+      this.idLocales,
+      this.idMeses,
+      this.idResiduos
+    ).pipe(
+      catchError((error) => {
+        this.mensajeService.errorServicioConsulta(error);
+        return EMPTY;
+      }),
+      finalize(() => (this.loading = false))
+    )
+      .subscribe((res: any) => {
+        this.graficoResiduos = res.codigo === 0 ? res.respuesta : [];
+        this.getStackedBarChartData();
+      });
+  }
+
+  listarGraficoVertical() {
+    this.dashboardService.listarGraficoVertical(
+      this.esCliente() ? this.autenticacionService.getDatosToken()?.codigoEmpresa || 0 : this.idCliente,
+      this.idAnio || 0,
+      this.idLocales,
+      this.idMeses,
+      this.idResiduos
+    ).pipe(
+      catchError((error) => {
+        this.mensajeService.errorServicioConsulta(error);
+        return EMPTY;
+      }),
+      finalize(() => (this.loading = false))
+    )
+      .subscribe((res: any) => {
+        // this.residuos = res.codigo === 0 ? res.respuesta : [];
+      });
+  }
+
+  getPrimaryColor(): string {
+    return getComputedStyle(document.documentElement).getPropertyValue('--p-primary-300') || '#2196f3';
+  }
+
+  generatePastelColors(count: number): string[] {
+    const colors: string[] = [];
+    const baseHue = 160; // Aproximado de #34d399 (verde esmeralda)
+
+    for (let i = 0; i < count; i++) {
+      const hue = (baseHue + i * 35) % 360;
+      colors.push(`hsl(${hue}, 60%, 75%)`); // pastel = baja saturación + alta luminancia
+    }
+
+    return colors;
+  }
+
+  setearChartOpciones() {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--text-color');
+    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    this.chartStackedOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      aspectRatio: 0.8,
+      plugins: {
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            label: (ctx: any) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()}`
+          }
+        },
+        legend: {
+          position: 'top',
+          labels: {
+            font: { size: 12 },
+            color: '#444'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: textColorSecondary,
+            font: {
+              weight: 500
+            }
+          },
+          grid: {
+            display: false,
+            drawBorder: false
+          },
+        },
+        y: {
+          ticks: {
+            color: textColorSecondary
+          },
+          grid: {
+            color: surfaceBorder,
+            drawBorder: false
+          },
+        }
+      }
+    }
+  }
+
+  getStackedBarChartData() {
+    this.setearChartOpciones()
+    const locales = this.getLocalesAgrupados();
+    const residuos = this.graficoResiduos.map(r => r.descResiduo);
+    const baseColor = this.generatePastelColors(this.graficoResiduos.length);
+
+    const datasets = residuos.map((residuo, index) => ({
+      label: residuo,
+
+      data: locales.map(loc => loc[residuo] || 0),
+      stack: 'residuos'
+    }));
+
+    this.chartData = {
+      labels: locales.map(loc => loc.descLocal),
+      datasets
+    };
+  }
+
+  applyAlphaToHex(hex: string, alpha: number): string {
+    // Convierte "#2196f3" a rgba
+    if (!hex.startsWith('#')) return hex;
+
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${Math.min(Math.max(alpha, 0.1), 1)})`;
+  }
+
+  getLocalesAgrupados(): LocalAgrupado[] {
+    if (!this.graficoResiduos?.length) return [];
+
+    const localesMap: { [key: string]: LocalAgrupado } = {};
+
+    for (const residuo of this.graficoResiduos) {
+      for (const local of residuo.detalleDashboard) {
+        const key = local.descLocal;
+
+        if (!localesMap[key]) {
+          localesMap[key] = { descLocal: local.descLocal };
+        }
+
+        localesMap[key][residuo.descResiduo] = local.total;
+      }
+    }
+
+    return Object.values(localesMap);
+  }
+
+  generateColor(seed: string): string {
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const h = hash % 360;
+    return `hsl(${h}, 60%, 55%)`;
+  }
+  buildChart() {
+    const locales = this.getLocalesAgrupados();
+    const residuos = this.graficoResiduos.map(r => r.descResiduo);
+
+    this.chartData = {
+      labels: locales.map(l => l.descLocal),
+      datasets: residuos.map(residuo => ({
+        label: residuo,
+        backgroundColor: this.generateColor(residuo),
+        data: locales.map(l => l[residuo] || 0)
+      }))
+    };
+
+    this.chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: false, ticks: { color: '#444' } },
+        y: { beginAtZero: true, ticks: { color: '#444' } }
+      },
+      plugins: {
+        legend: { position: 'top' }
+      }
+    };
+  }
+
+  getPorcentaje(valor: number, total: number): number {
+    if (total === 0) return 0;
+    return Math.round((valor / total) * 100);
   }
 
   setDataPrueba() {
@@ -187,6 +426,10 @@ export class DashboardComponent {
     }).format(value);
   }
 
+  esCliente() {
+    return this.autenticacionService.getDatosToken()?.tipoUsuario == 2
+  }
+
 
   setChartResiduos() {
 
@@ -222,7 +465,8 @@ export class DashboardComponent {
         PARAMETROS.MANTENIMIENTO.EMPRESAS.ANIOS
       ),
       locales: this.localService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, 1),
-      residuos: this.residuosService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, 1)
+      residuos: this.residuosService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, 1),
+      empresas: this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, "", "", 1),
     })
       .pipe(
         catchError(error => {
@@ -231,10 +475,11 @@ export class DashboardComponent {
         }),
         finalize(() => this.loading = false)
       )
-      .subscribe(({ anios, locales, residuos }) => {
+      .subscribe(({ anios, locales, residuos, empresas }) => {
         this.anios = anios.codigo === 0 ? anios.respuesta : [];
-        this.locales = locales.codigo === 0 ? locales.respuesta : [];
+        this.localesFiltro = locales.codigo === 0 ? locales.respuesta : [];
         this.residuos = residuos.codigo === 0 ? residuos.respuesta : [];
+        this.empresas = empresas.codigo === 0 ? empresas.respuesta : [];
       });
   }
   limpiar() {
@@ -246,7 +491,8 @@ export class DashboardComponent {
   }
 
   buscar() {
-
+    this.listarGraficoBarra()
+    this.listarGraficoVertical()
   }
 
   descargar(nombre: string) {

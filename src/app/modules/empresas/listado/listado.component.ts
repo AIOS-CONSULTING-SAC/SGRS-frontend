@@ -90,8 +90,7 @@ export class ListadoComponent implements OnInit {
 
       accept: () => {
          this.clienteService
-          .eliminar(cliente.cliente, this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0,
-          this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0)
+          .eliminar(cliente.cliente, this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0)
           .pipe(finalize(() => this.buscar()))
           .subscribe({
             next: (res) => {

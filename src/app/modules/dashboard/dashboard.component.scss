@@ -1,0 +1,70 @@
+.panel-subtotal {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  background-color: #ffffff;
+}
+
+.panel-subtotal .titulo {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #000000;
+}
+
+.panel-subtotal .residuo {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #23988E; // Verde institucional
+}
+
+.panel-subtotal .valor {
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #000000;
+}
+
+.panel-subtotal .unidad {
+  color: #CC0000;
+  font-weight: bold;
+}
+
+/* === Card inferior (Top locales) === */
+.card-locales {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+.card-locales .titulo {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.card-locales .fila-local {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-locales .barra {
+  flex: 1;
+}
+
+.card-locales .valor {
+  width: 60px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #23988E;
+}
+
+.card-locales .nombre {
+  white-space: nowrap;
+  font-size: 0.9rem;
+}

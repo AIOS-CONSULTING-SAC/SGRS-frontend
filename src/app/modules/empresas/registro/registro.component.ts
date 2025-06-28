@@ -55,8 +55,7 @@ export class RegistroComponent {
       idProvincia: ['', Validators.required],
       idDistrito: ['', Validators.required],
       direccion: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/),Validators.maxLength(400)]],
-      idEstado: [''],
-      usuarioSesion: [this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? ''],
+      idEstado: [''], 
     });
 
   }
@@ -173,8 +172,7 @@ export class RegistroComponent {
       idDepartamento: this.form.get('idDepartamento').value,
       idProvincia: this.form.get('idProvincia').value,
       idDistrito: this.form.get('idDistrito').value,
-      idEstado: this.form.get('idEstado').value || 0,
-      usuarioSesion: this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0
+      idEstado: this.form.get('idEstado').value || 0, 
     };
   }
 

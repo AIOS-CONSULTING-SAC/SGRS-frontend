@@ -41,8 +41,7 @@ export class RegistrarLocalComponent implements OnInit {
       codCliente: [this.cliente?.cliente],
       nombre: ['', [Validators.required,Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(100)]],
       direccion: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(400)]],
-      idEstado: [1,Validators.required], 
-      usuarioSesion: [this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? ''],
+      idEstado: [1,Validators.required],  
     });
   }
 
@@ -55,8 +54,7 @@ export class RegistrarLocalComponent implements OnInit {
     if (this.form.valid) {
       const request: GuardarLocalRequest = {
         local: this.form.get('local').value ?? null,
-        codCliente: this.cliente.cliente,
-        usuarioSesion: this.autenticacionService.getDatosToken()?.codigoUsuario.toString() ?? '',
+        codCliente: this.cliente.cliente, 
         nombre: this.form.get('nombre').value,
         direccion: this.form.get('direccion').value,
         idEstado: this.form.get('idEstado').value,

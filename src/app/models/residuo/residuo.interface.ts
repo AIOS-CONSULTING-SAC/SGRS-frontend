@@ -5,8 +5,7 @@ export interface GuardarResiduoRequest {
   codCliente: number;
   descripcion: string;
   idUnidad: number | null;
-  idEstado: number;
-  usuarioSesion: number;
+  idEstado: number; 
   mensaje?: string;
 }
 
@@ -62,6 +61,5 @@ export interface GuardarManejoResiduoRequest {
   codResiduo: number;
   anio: number;
   detalle: { mes: number; cantidad: number }[];
-  idEstado?: number;
-  usuarioSesion?: string;
+  idEstado?: number; 
 }

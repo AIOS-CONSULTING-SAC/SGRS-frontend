@@ -22,8 +22,7 @@ export interface GuardarLocalRequest {
   idProvincia?: number;
   idDistrito?: number;
   direccion: string;
-  idEstado: number;
-  usuarioSesion: string;
+  idEstado: number; 
 }
 
 export type ListadoLocalesEmpresaResponse = ApiResponse<LocalResponse[]>

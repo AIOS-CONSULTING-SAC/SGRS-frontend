@@ -154,7 +154,7 @@ export class ListadoComponent implements OnInit {
 
       accept: () => {
         this.parametroService
-          .eliminar(parametro.parametro, this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0)
+          .eliminar(parametro.parametro)
           .pipe(finalize(() => this.buscar()))
           .subscribe({
             next: (res) => {

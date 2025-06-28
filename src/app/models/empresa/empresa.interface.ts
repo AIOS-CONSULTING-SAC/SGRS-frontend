@@ -9,13 +9,11 @@ export interface GuardarEmpresaRequest {
   idProvincia: number
   idDistrito: number;
   direccion: string
-  idEstado: number;
-  usuarioSesion: number;
+  idEstado: number; 
 }
 
 export interface EliminarEmpresaRequest {
-  idEmpresa: number;
-  usuarioSesion: number;
+  idEmpresa: number; 
 }
 
 export interface EmpresaTO {

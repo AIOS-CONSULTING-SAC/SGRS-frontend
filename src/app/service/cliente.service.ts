@@ -31,8 +31,8 @@ export class ClienteService {
     return this.http.obtenerQueryPost<any>(apiServicio + 'guardar', request)
   }
 
-  eliminar(idCliente: number, idEmpresa: number, usuarioSesion:number) {
-    let url = apiServicio + `eliminar?idCliente=${idCliente}&idEmpresa=${idEmpresa}&usuarioSesion=${usuarioSesion}`
+  eliminar(idCliente: number, idEmpresa: number) {
+    let url = apiServicio + `eliminar?idCliente=${idCliente}&idEmpresa=${idEmpresa}`
     return this.http.obtenerQueryDelete<any>(url)
   }
 }

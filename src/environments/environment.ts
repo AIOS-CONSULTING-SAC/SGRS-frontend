@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  version: 'v0.1',
+  version: 'v1.0.0',
   apiRest: {
     host: 'http://localhost:9099/sgrs-backend'
   }

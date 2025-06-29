@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'  
 import { HttpService } from '../shared/http.service'
-import { environment } from '../../enviroments/environment';
+import { environment } from '../../environments/environment';
 import { EmpresaTO, GuardarEmpresaRequest, ListadoEmpresasResponse } from '../models/empresa/empresa.interface';
 import { Observable } from 'rxjs';
 import { ApiResponse, ApiResponseCrud } from '../models/respuesta';

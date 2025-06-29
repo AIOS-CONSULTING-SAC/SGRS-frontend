@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs'
 import { catchError, filter, finalize, switchMap, take, timeout } from 'rxjs/operators'
 
 import { Router } from '@angular/router'
-import { environment } from '../../enviroments/environment'
+import { environment } from '../../environments/environment'
 import { AutenticacionService } from './autenticacion.service'
 import { MensajesToastService } from '../shared/mensajes-toast.service'
 

@@ -34,14 +34,12 @@
                 </small>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Local <small
-                        class="p-error">*</small></label>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Local</label>
                 <p-multi-select [options]="localesFiltro" formControlName="local" optionValue="local"
-                    optionLabel="nombre" class="w-full" placeholder="Seleccione local"
-                    [class]="formHelper.esClaseInvalido('local')" />
-                <small *ngIf="formHelper.esCampoInvalido('local')" class="p-error">
+                    optionLabel="nombre" class="w-full" placeholder="Seleccione local"  />
+                <!-- <small *ngIf="formHelper.esCampoInvalido('local')" class="p-error">
                     {{ formHelper.obtenerMensajeErrorDefecto() }}
-                </small>
+                </small> -->
             </div>
 
         </div>
@@ -65,8 +63,7 @@
         <ng-template pTemplate="header">
             <tr>
                 <th style="width: 3rem"></th>
-                <th>Local</th>
-                <th class="text-right">Total</th>
+                <th>Local</th> 
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-local let-expanded="expanded">
@@ -77,7 +74,7 @@
                         [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
                 </td>
                 <td>{{ local.descLocal }}</td>
-                <td class="text-right">{{ local.total | number: '1.2-2' }}</td>
+                <!-- <td class="text-right">{{ local.total | number: '1.2-2' }}</td> -->
             </tr>
         </ng-template>
 

@@ -12,9 +12,10 @@ const apiServicio = 'api/v1/residuos/';
 export class ResiduoService {
   constructor(private http: HttpService) { }
 
-  listado(codCliente?: number | null, idEstado?: number | null): Observable<ListadoResiduosEmpresaResponse> {
+  listado(codCliente?: number | null,descResiduo?: string, idEstado?: number | null): Observable<ListadoResiduosEmpresaResponse> {
     let url = apiServicio + 'listar?';
     if (codCliente != null) url += `codCliente=${codCliente}`;
+    if (descResiduo != null) url += `&descResiduo=${descResiduo}`;
     if (idEstado != null) url += `&idEstado=${idEstado}`;
     return this.http.obtenerQueryGet<ListadoResiduosEmpresaResponse>(url);
   }

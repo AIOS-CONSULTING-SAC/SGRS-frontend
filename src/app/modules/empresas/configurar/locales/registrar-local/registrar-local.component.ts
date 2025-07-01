@@ -36,7 +36,11 @@ export class RegistrarLocalComponent implements OnInit {
     private mensajeService: MensajesToastService,
     private autenticacionService: AutenticacionService
   ) {
-    this.form = this.fb.group({
+    this.setearForm()
+  }
+
+  setearForm(){
+     this.form = this.fb.group({
       local: [null],
       codCliente: [this.cliente?.cliente],
       nombre: ['', [Validators.required,Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(100)]],
@@ -44,12 +48,16 @@ export class RegistrarLocalComponent implements OnInit {
       idEstado: [1,Validators.required],  
     });
   }
-
   ngOnInit(): void {
     this.formHelper = new FormHelper(this.form);
 
   }
 
+  nuevo(){
+    this.form.reset();
+    this.visible = true
+    this.setearForm()
+  }
   guardar() {
     if (this.form.valid) {
       const request: GuardarLocalRequest = {

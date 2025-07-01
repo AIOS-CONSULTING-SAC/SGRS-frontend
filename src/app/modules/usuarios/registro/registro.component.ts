@@ -59,7 +59,7 @@ export class RegistroComponent {
       nombre: [this.usuario?.nombre || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
       apellidoP: [this.usuario?.apellidoP || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
       apellidoM: [this.usuario?.apellidoM || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
-      telefono: [this.usuario?.telefono || '', [Validators.maxLength(20), Validators.pattern(/^[0-9]+$/)]],
+      telefono: [this.usuario?.telefono || '', [ Validators.minLength(7),Validators.maxLength(20), Validators.pattern(/^[0-9]+$/)]],
       correo: [this.usuario?.correo || '', [Validators.required, Validators.email, Validators.maxLength(100)]],
       idEstado: [this.usuario?.idEstado ?? 1], 
     });

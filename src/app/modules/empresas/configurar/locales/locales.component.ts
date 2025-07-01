@@ -25,7 +25,7 @@ import { ClienteResponse } from '../../../../models/cliente/cliente.interface';
 })
 export class LocalesComponent {
   nombre!: string
-  estado!: number | null
+  estado: any = '1'
   loading: boolean = false
   locales: LocalResponse[] = []
   @ViewChild(RegistrarLocalComponent) registrarLocal!: RegistrarLocalComponent;
@@ -42,12 +42,13 @@ export class LocalesComponent {
   }
   limpiar() {
     this.nombre = '';
-    this.estado = null;
+    this.estado = '1';
+    this.buscar()
   }
 
   buscar() {
     this.loading = true;
-    this.localService.listado(this.cliente?.cliente, this.estado).pipe(
+    this.localService.listado(this.cliente?.cliente, this.nombre, this.estado).pipe(
       catchError((errorResponse: any) => {
         this.mensajeService.errorServicioConsulta(errorResponse);
 
@@ -61,7 +62,7 @@ export class LocalesComponent {
   }
 
   registrar() {
-    this.registrarLocal.visible = true
+    this.registrarLocal.nuevo()
   }
   editar(local: LocalResponse) {
     this.registrarLocal.titulo = 'Editar local';

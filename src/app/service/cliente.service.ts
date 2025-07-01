@@ -17,7 +17,7 @@ export class ClienteService {
   listado(idEmpresa?: number | null, ruc?: string, razonSocial?: string, idEstado?: number | null): Observable<ApiResponse<ClienteResponse[]>> {
     let url =apiServicio + `listar?`
     if (idEmpresa) url += `idEmpresa=${idEmpresa}`
-    if (ruc) url += `ruc=${ruc}`
+    if (ruc) url += `&ruc=${ruc}`
     if (razonSocial) url += `&razonSocial=${razonSocial}`
     if (idEstado) url += `&idEstado=${idEstado}`
     return this.http.obtenerQueryGet<ListadoClientesResponse>(url)

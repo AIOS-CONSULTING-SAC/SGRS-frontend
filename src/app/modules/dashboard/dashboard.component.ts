@@ -92,8 +92,8 @@ export class DashboardComponent {
     this.loading = true;
 
     forkJoin({
-      locales: this.localService.listado(this.obtenerCodCliente(), 1),
-       residuos: this.residuosService.listado(this.obtenerCodCliente(), 1),
+      locales: this.localService.listado(this.obtenerCodCliente(),'', 1),
+       residuos: this.residuosService.listado(this.obtenerCodCliente(),'', 1),
     })
       .pipe(
         catchError(error => {
@@ -427,7 +427,7 @@ export class DashboardComponent {
   }
 
   esCliente() {
-    return this.autenticacionService.getDatosToken()?.tipoUsuario == 2
+    return this.autenticacionService.getDatosToken()?.tipoUsuario == 1
   }
 
 
@@ -464,8 +464,8 @@ export class DashboardComponent {
         PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
         PARAMETROS.MANTENIMIENTO.EMPRESAS.ANIOS
       ),
-      locales: this.localService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, 1),
-      residuos: this.residuosService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, 1),
+      locales: this.localService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa,'', 1),
+      residuos: this.residuosService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa,'', 1),
       empresas: this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, "", "", 1),
     })
       .pipe(

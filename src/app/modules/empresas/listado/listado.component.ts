@@ -28,7 +28,7 @@ export class ListadoComponent implements OnInit {
   loading = false;
   razonSocial = '';
   ruc = '';
-  estado:number | null = null;
+estado: any = '1'
   tituloComponente!: string;
   @Output() registrar = new EventEmitter();
   @Output() editar = new EventEmitter<ClienteResponse>();
@@ -67,7 +67,7 @@ export class ListadoComponent implements OnInit {
   limpiar() {
     this.razonSocial = '';
     this.ruc = '';
-    this.estado = null;
+    this.estado = '1';
     this.buscar();
   }
 

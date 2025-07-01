@@ -34,7 +34,7 @@ import { AutenticacionService } from '../../../../auth/autenticacion.service';
 })
 export class ResiduosComponent {
   nombre: string = '';
-  estado!: number | null;
+  estado: any = '1';
   loading: boolean = false;
   residuos: ResiduoResponse[] = [];
 
@@ -55,14 +55,14 @@ export class ResiduosComponent {
 
   limpiar() {
     this.nombre = '';
-    this.estado = null;
+    this.estado = '1';
     this.buscar();
   }
 
   buscar() {
     this.loading = true;
     this.residuosService
-      .listado(this.cliente?.cliente, this.estado)
+      .listado(this.cliente?.cliente,this.nombre, this.estado)
       .pipe(
         catchError((error) => {
           this.mensajeService.errorServicioConsulta(error);

@@ -155,6 +155,22 @@
                     color: var(--text-color-secondary) !important;
                 }
             }
+
+            .layout-topbar-action-perfil {
+                
+
+                span {
+                    font-size: 1rem;
+                    margin-right: 0.5rem;
+                    color: var(--text-color-secondary) !important;
+                }
+
+                small {
+                    font-weight: medium;
+                    display: block;
+                    color: var(--text-color-secondary) !important;
+                }
+            }
         }
 
         .layout-topbar-menu-content {

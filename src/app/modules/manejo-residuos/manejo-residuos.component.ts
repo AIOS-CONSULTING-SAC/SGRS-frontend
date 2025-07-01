@@ -58,7 +58,7 @@ export class ManejoResiduosComponent {
     this.form = this.fb.group({
       empresa: [null, Validators.required],
       anio: [null,  Validators.required],
-      local: [null,  Validators.required]
+      local: [null]
     });
   }
 
@@ -226,7 +226,7 @@ export class ManejoResiduosComponent {
     this.loading = true;
 
     forkJoin({
-      locales: this.localService.listado(this.form.get('empresa').value, 1)
+      locales: this.localService.listado(this.form.get('empresa').value, '',1)
     })
       .pipe(
         catchError(error => {
@@ -248,7 +248,7 @@ export class ManejoResiduosComponent {
     }
 
     this.loading = true;
-    this.menajoResiduoService.listado(this.form.get('empresa').value, this.form.get('anio').value, this.form.get('local').value).pipe(
+    this.menajoResiduoService.listado(this.form.get('empresa').value, this.form.get('anio').value, this.form.get('local').value ?? this.localesFiltro.map(r => r.local).join(',')).pipe(
       catchError((errorResponse: any) => {
         this.mensajeService.errorServicioConsulta(errorResponse);
 

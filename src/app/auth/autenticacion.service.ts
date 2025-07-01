@@ -93,7 +93,7 @@ export class AutenticacionService {
   obtenerNombresApe(): string {
     const tokenPayload = this.decodeToken()
     if (tokenPayload) {
-      return `${tokenPayload.nombres} ${tokenPayload.apellidosP} ${tokenPayload.apellidosM}`
+      return `${tokenPayload.nombres} ${tokenPayload.apellidoP} ${tokenPayload.apellidoM}`
     }
     return ''
   }
@@ -160,6 +160,6 @@ type TokenPayload = {
   codigoUsuario: number
   tipoUsuario: number
   nombres: string
-  apellidosP: string
-  apellidosM: string
+  apellidoP: string
+  apellidoM: string
 }

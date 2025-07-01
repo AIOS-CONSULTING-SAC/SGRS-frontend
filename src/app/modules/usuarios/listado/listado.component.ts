@@ -33,7 +33,7 @@ export class ListadoComponent {
 
   ruc = '';
   nombres: string = ''
-  estado: 'Activo' | 'Inactivo' | '' = 'Activo';
+  estado: any = '1';
 
   tipoUsuario: ParametroResponse[] = [];
   idTipoUsuario: string = '';
@@ -117,15 +117,13 @@ export class ListadoComponent {
       this.loading = false
       return
     }
-    const estadoNumerico = this.estado === 'Activo' ? 1 : this.estado === 'Inactivo' ? 0 : undefined;
-
     this.usuarioService
       .listar({
         tipoUser: this.idTipoUsuario ? +this.idTipoUsuario : undefined,
         perfil: this.idTipoPerfil ? +this.idTipoPerfil : undefined,
         nroDocumento: this.ruc,
         nombre: this.nombres,
-        idEstado: estadoNumerico,
+        idEstado: this.estado,
       }).pipe(
         catchError((errorResponse: any) => {
           this.mensajeToast.errorServicioConsulta(errorResponse);

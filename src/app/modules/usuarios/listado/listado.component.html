@@ -29,8 +29,9 @@
     <div class="col-span-12 md:col-span-4">
       <label class="block text-sm font-medium text-slate-700 mb-1">Estado</label>
       <p-dropdown placeholder="Especifique estado" [options]="[
-            {label: 'Activo', value: 'ACTIVO'},
-            {label: 'Inactivo', value: 'INACTIVO'}
+             {label: 'Todos', value: ''},
+                  {label: 'Activo', value: '1'},
+                  {label: 'Inactivo', value: '0'}
           ]" [(ngModel)]="estado" class="w-full" />
     </div>
   </div>

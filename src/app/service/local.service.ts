@@ -14,9 +14,11 @@ export class LocalService {
   constructor(private http: HttpService) { 
   }
 
-  listado(codCliente?: number | null, idEstado?: number | null): Observable<ListadoLocalesEmpresaResponse> {
+  listado(codCliente?: number | null,descLocal?: string | null, idEstado?: number | null): Observable<ListadoLocalesEmpresaResponse> {
     let url = apiServicio + 'listar?';
     if (codCliente != null) url += `codCliente=${codCliente}`;
+    if (descLocal != null) url += `&descLocal=${descLocal}`;
+    
     if (idEstado != null) url += `&idEstado=${idEstado}`;
     return this.http.obtenerQueryGet<ListadoLocalesEmpresaResponse>(url);
   }

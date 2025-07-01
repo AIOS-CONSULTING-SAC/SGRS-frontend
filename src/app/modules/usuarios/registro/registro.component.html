@@ -17,7 +17,7 @@
         </small>
       </div>
       <div *ngIf="form.get('codTipoUser').value == 1">
-        <label class="block text-sm font-medium text-slate-700 mb-1">Empresa<small class="p-error">*</small></label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Empresa <small class="p-error">*</small></label>
         <p-dropdown [options]="empresas" formControlName="codCliente" optionLabel="nombreComercial"
           optionValue="cliente" placeholder="Seleccione tipo" class="w-full"
           [class]="formHelper.esClaseInvalido('codCliente')" />
@@ -42,7 +42,7 @@
             class="p-error">*</small></label>
         <p-dropdown [options]="tipoDocumento" formControlName="codTipoDoc" optionLabel="descripcion1"
           optionValue="correlativo" placeholder="Seleccione tipo" class="w-full"
-          [class]="formHelper.esClaseInvalido('codTipoDoc')" />
+          [class]="formHelper.esClaseInvalido('codTipoDoc')" (ngModelChange)="cambiarTipoDoc()" />
         <small *ngIf="formHelper.esCampoInvalido('codTipoDoc')" class="p-error">
           {{ formHelper.obtenerMensajeErrorDefecto() }}
         </small>

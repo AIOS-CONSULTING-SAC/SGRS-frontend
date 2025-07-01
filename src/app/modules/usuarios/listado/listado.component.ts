@@ -113,7 +113,7 @@ export class ListadoComponent {
   buscar() {
     this.loading = true;
     if (this.idTipoUsuario == '') {
-      this.mensajeToast.error('Error', 'Debe seleccionar un tipo de usuario.');
+      this.mensajeToast.advertencia('Validación', 'Debe seleccionar un tipo de usuario.');
       this.loading = false
       return
     }

@@ -36,7 +36,7 @@ export class ManejoResiduosComponent {
   anios: ParametroResponse[] = [];
   tituloComponente: string = 'Manejo de Residuos';
   localesFiltro: any[] = [];
-  localesResiduos: ManejoResiduoResponse[] = []; 
+  localesResiduos: ManejoResiduoResponse[] = [];
   residuosPorLocal: any[] = [];
   meses = ['Ene', 'Febr', 'Mar', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agos', 'Sept', 'Oct', 'Nov', 'Dic'];
   modoEdicion: boolean = false;
@@ -57,7 +57,7 @@ export class ManejoResiduosComponent {
     private fb: FormBuilder) {
     this.form = this.fb.group({
       empresa: [null, Validators.required],
-      anio: [null,  Validators.required],
+      anio: [null, Validators.required],
       local: [null]
     });
   }
@@ -74,10 +74,10 @@ export class ManejoResiduosComponent {
 
   editar() {
     this.modoEdicion = !this.modoEdicion;
-    
+
   }
 
-  guardar() { 
+  guardar() {
     const idEstado = 1;
     const anio = this.form.get('anio').value;
     const requests = Object.values(this.registrosModificados)
@@ -86,51 +86,52 @@ export class ManejoResiduosComponent {
         codResiduo: item.codResiduo,
         anio,
         detalle: item.detalle.filter(d => d.cantidad !== null && !isNaN(d.cantidad)),
-        idEstado, 
+        idEstado,
       }))
       .filter(req => req.detalle.length > 0);
 
-    this.loading = true
+    this.loading = true;
 
-    from(requests)
-      .pipe(
-        mergeMap((req) =>
-          this.menajoResiduoService.registrar(req).pipe(
-            catchError(err => {
-               const mensaje = this.obtenerMensajeDeError(err, req);
-              this.mensajeService.error('Error al guardar', mensaje);
-              return of(null);
-            })
-          )
-        )
+    const observables = requests.map(req =>
+      this.menajoResiduoService.registrar(req).pipe(
+        catchError(err => {
+          const mensaje = this.obtenerMensajeDeError(err, req);
+          this.mensajeService.error('Error al guardar', mensaje);
+          return of(null);
+        })
       )
-      .subscribe({
-        next: res => {
-          this.mensajeService.exito('Completado', 'Todos los residuos fueron enviados');
-        },
-        complete: () => {
-          this.loading = false
-          this.registrosModificados = {};
-          this.modoEdicion = false
-          this.buscar()
+    );
+
+    forkJoin(observables).subscribe({
+      next: results => {
+        const todosExitosos = results.every(res => res !== null);
+        if (todosExitosos) {
+          this.mensajeService.exito('Éxito', 'Todos los residuos fueron enviados');
         }
-      });
+      },
+      complete: () => {
+        this.loading = false;
+        this.registrosModificados = {};
+        this.modoEdicion = false;
+        this.buscar();
+      }
+    });
   }
 
   obtenerMensajeDeError(error: any, req: GuardarManejoResiduoRequest): string {
-  const local = req.codLocal;
-  const residuo = req.codResiduo;
+    const local = req.codLocal;
+    const residuo = req.codResiduo;
 
-  if (error?.error?.message) {
-    return `Local ${local}, residuo ${residuo}: ${error.error.message}`;
+    if (error?.error?.message) {
+      return `Local ${local}, residuo ${residuo}: ${error.error.message}`;
+    }
+
+    if (error?.status === 0) {
+      return `No se pudo conectar al servidor (Local ${local}, residuo ${residuo}).`;
+    }
+
+    return `Error desconocido al guardar Local ${local}, residuo ${residuo}.`;
   }
-
-  if (error?.status === 0) {
-    return `No se pudo conectar al servidor (Local ${local}, residuo ${residuo}).`;
-  }
-
-  return `Error desconocido al guardar Local ${local}, residuo ${residuo}.`;
-}
 
   permitirSoloNumerosDecimal(event: KeyboardEvent) {
     const inputChar = event.key;
@@ -166,7 +167,7 @@ export class ManejoResiduosComponent {
       input.value = corregido;
       residuo['mes' + mesIndex.toString().padStart(2, '0')] = corregido;
     }
-  
+
     const cantidad = parseFloat(valor);
     const mes = mesIndex;
 
@@ -189,7 +190,7 @@ export class ManejoResiduosComponent {
       detalle.push({ mes, cantidad });
     }
 
-    
+
   }
   cargarFiltrosIniciales() {
     this.loading = true;
@@ -220,13 +221,13 @@ export class ManejoResiduosComponent {
     this.listarLocales()
   }
 
-  
+
 
   listarLocales() {
     this.loading = true;
 
     forkJoin({
-      locales: this.localService.listado(this.form.get('empresa').value, '',1)
+      locales: this.localService.listado(this.form.get('empresa').value, '', 1)
     })
       .pipe(
         catchError(error => {
@@ -242,7 +243,7 @@ export class ManejoResiduosComponent {
   }
 
   buscar() {
-    if(!this.form.valid){
+    if (!this.form.valid) {
       this.form.markAllAsTouched();
       return
     }

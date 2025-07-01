@@ -55,14 +55,19 @@ export class RegistroComponent {
       codPerfil: [this.usuario?.codPerfil || null],
       codCliente: [this.usuario?.codCliente || null],
       codTipoDoc: [this.usuario?.codTipoDoc || '', [Validators.required]],
-      ndoc: [this.usuario?.ndoc || '', [Validators.required, Validators.maxLength(15), Validators.pattern(/^[0-9]+$/)]],
+      ndoc: [this.usuario?.ndoc || '', [Validators.required]],
       nombre: [this.usuario?.nombre || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
       apellidoP: [this.usuario?.apellidoP || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
       apellidoM: [this.usuario?.apellidoM || '', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/), Validators.maxLength(100)]],
-      telefono: [this.usuario?.telefono || '', [ Validators.minLength(7),Validators.maxLength(20), Validators.pattern(/^[0-9]+$/)]],
+      telefono: [this.usuario?.telefono || '', [Validators.minLength(7), Validators.maxLength(20), Validators.pattern(/^[0-9]+$/)]],
       correo: [this.usuario?.correo || '', [Validators.required, Validators.email, Validators.maxLength(100)]],
-      idEstado: [this.usuario?.idEstado ?? 1], 
+      idEstado: [this.usuario?.idEstado ?? 1],
     });
+
+     
+
+    // Inicializa la validación si ya hay valor cargado
+    this.actualizarValidacionNdoc(this.form.get('codTipoDoc').value);
   }
 
   ngOnInit() {
@@ -71,6 +76,35 @@ export class RegistroComponent {
     if (this.usuario) {
 
     }
+  }
+
+  cambiarTipoDoc(){
+   
+     const valor = this.form.get('codTipoDoc').value;
+      console.log("cambio" + valor)
+     this.actualizarValidacionNdoc(valor);
+  }
+
+  actualizarValidacionNdoc(codTipoDoc: string | number) {
+    const ndocCtrl = this.form.get('ndoc');
+
+    if (!ndocCtrl) return;
+
+    let validators = [Validators.required];
+
+    if (codTipoDoc === 1) {
+      // DNI: solo números, 8 dígitos
+      validators.push(Validators.pattern(/^[0-9]{8}$/));
+    } else if (codTipoDoc === 2) {
+      // RUC: solo números, 11 dígitos
+      validators.push(Validators.pattern(/^[0-9]{11}$/));
+    } else {
+      // Otros: máximo 15 caracteres numéricos
+      validators.push(Validators.pattern(/^[0-9]+$/), Validators.maxLength(15));
+    }
+
+    ndocCtrl.setValidators(validators);
+    ndocCtrl.updateValueAndValidity();
   }
 
   setearEstados() {
@@ -121,7 +155,7 @@ export class RegistroComponent {
 
   cargarTipoUsuario(): void {
     this.loading = true
-    this.parametroService.listado(1,PARAMETROS.MODULOS.MANTENIMIENTO,
+    this.parametroService.listado(1, PARAMETROS.MODULOS.MANTENIMIENTO,
       PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
       PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_USUARIO).pipe(
         catchError(error => {
@@ -140,20 +174,20 @@ export class RegistroComponent {
   cargarPerfiles(): void {
     this.loading = true
 
-    this.parametroService.listado(1,PARAMETROS.MODULOS.MANTENIMIENTO, 
-      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS, 
-    PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL).pipe(
-      catchError(error => {
-        this.mensajeToast.errorServicioConsulta(error);
-        return EMPTY;
-      }), finalize(() => { this.loading = false })
-    ).subscribe(response => {
-      if (response.codigo === 0) {
-        this.tipoPerfil = response.respuesta;
-      } else {
-        this.tipoPerfil = [];
-      }
-    });
+    this.parametroService.listado(1, PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
+      PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL).pipe(
+        catchError(error => {
+          this.mensajeToast.errorServicioConsulta(error);
+          return EMPTY;
+        }), finalize(() => { this.loading = false })
+      ).subscribe(response => {
+        if (response.codigo === 0) {
+          this.tipoPerfil = response.respuesta;
+        } else {
+          this.tipoPerfil = [];
+        }
+      });
   }
 
   cargarClientes() {
@@ -173,21 +207,21 @@ export class RegistroComponent {
 
   cargarTipoDoc(): void {
     this.loading = true
-    this.parametroService.listado(1,PARAMETROS.MODULOS.MANTENIMIENTO, 
-      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS, 
-    PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_DOCUMENTO).pipe(
-      catchError(error => {
-        this.mensajeToast.errorServicioConsulta(error);
-        return EMPTY;
-      }), finalize(() => { this.loading = false })
-    ).subscribe(response => {
+    this.parametroService.listado(1, PARAMETROS.MODULOS.MANTENIMIENTO,
+      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
+      PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_DOCUMENTO).pipe(
+        catchError(error => {
+          this.mensajeToast.errorServicioConsulta(error);
+          return EMPTY;
+        }), finalize(() => { this.loading = false })
+      ).subscribe(response => {
 
-      this.tipoDocumento = response.codigo === 0 && response.respuesta.length > 0 ? response.respuesta : [];
+        this.tipoDocumento = response.codigo === 0 && response.respuesta.length > 0 ? response.respuesta : [];
 
-    });
+      });
   }
 
-  
+
 
   request(): GuardarUsuarioRequest {
     return {
@@ -209,20 +243,26 @@ export class RegistroComponent {
   }
 
   guardar() {
-    this.loading = true
-    this.usuarioService.registrar(this.request()).pipe(
-      catchError((errorResponse: any) => {
-        this.mensajeToast.errorServicioGuardado(errorResponse);
-        return EMPTY;
-      }), finalize(() => { this.loading = false })
-    ).subscribe((response: ApiResponseCrud) => {
-      const { respuesta, codigo, mensaje } = response;
-      if (codigo === 0 && respuesta == '200') {
-        this.mensajeToast.exito('Éxito', mensaje)
-        this.volver.emit();
-      } else {
-        this.mensajeToast.error('Error', mensaje)
-      }
-    });
+    if (this.form.valid) {
+      this.loading = true
+      this.usuarioService.registrar(this.request()).pipe(
+        catchError((errorResponse: any) => {
+          this.mensajeToast.errorServicioGuardado(errorResponse);
+          return EMPTY;
+        }), finalize(() => { this.loading = false })
+      ).subscribe((response: ApiResponseCrud) => {
+        const { respuesta, codigo, mensaje } = response;
+        if (codigo === 0 && respuesta == '200') {
+          this.mensajeToast.exito('Éxito', mensaje)
+          this.volver.emit();
+        } else {
+          this.mensajeToast.error('Error', mensaje)
+        }
+      });
+    } else {
+      this.form.markAllAsTouched();
+    }
   }
+
+
 }

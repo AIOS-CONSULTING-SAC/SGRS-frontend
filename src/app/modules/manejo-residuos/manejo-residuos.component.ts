@@ -283,8 +283,7 @@ export class ManejoResiduosComponent {
       }
       mapa.get(r.codLocal).residuos.push(r);
       mapa.get(r.codLocal).total += r.total;
-    }
-    console.log(mapa.values());
+    } 
     return Array.from(mapa.values());
   }
 

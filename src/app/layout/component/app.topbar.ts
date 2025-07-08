@@ -44,7 +44,7 @@ import { AutenticacionService } from '../../auth/autenticacion.service';
                     </button> -->
                     <div  class="layout-topbar-action-perfil ">
                         <span>{{nombresCompletos}}</span>
-                        <small style="text-transform: uppercase;display:block;font-weight:bolder">Perfil Prueba</small>
+                        <small style="text-transform: uppercase;display:block;font-weight:bolder">{{descPerfil}}</small>
                     </div>
                     <button type="button" (click)="logout()" class="layout-topbar-action">
                         <i class="pi pi-sign-out"></i>
@@ -75,5 +75,10 @@ export class AppTopbar {
     get nombresCompletos() {
         const datosToken = this.autenticacion.getDatosToken();
         return `${datosToken?.nombres} ${datosToken?.apellidoP} ${datosToken?.apellidoM}`;
+    }
+
+    get descPerfil(){
+       return this.autenticacion.obtenerPerfil();
+        
     }
 }

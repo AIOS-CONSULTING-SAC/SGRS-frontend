@@ -2,7 +2,7 @@ import { ApiResponse } from "../respuesta";
 
 export interface UsuarioResponse {
 usuario: number;
-  codEmpresa: number;
+  codigoEmpresa: number;
   descEmpresa: string;
   codCliente: number;
   descCliente: string;

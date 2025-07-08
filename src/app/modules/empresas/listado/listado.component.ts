@@ -72,7 +72,6 @@ estado: any = '1'
   }
 
   eliminar(cliente: ClienteResponse) {
-    console.log(cliente);
     this.confirmationService.confirm({
 
       message: '¿Está seguro que desea desactivar la empresa <b>' + cliente.razonSocial + '</b> ? <br /><br />Podrá reactivar en cualquier momento.',

@@ -136,7 +136,6 @@ export class ListadoComponent implements OnInit {
   }
 
   eliminar(parametro: ParametroResponse) {
-    console.log(parametro);
     this.confirmationService.confirm({
 
       message: '¿Está seguro que desea desactivar el parámetro <b>' + parametro.descripcion1 + '</b> ? <br /><br />Podrá reactivar en cualquier momento.',

@@ -169,8 +169,7 @@ export class RegistroComponent implements OnInit {
   }
 
 
-  guardar() {
-    console.log(this.request())
+  guardar() { 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

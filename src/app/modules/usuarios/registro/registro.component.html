@@ -10,7 +10,7 @@
         <label class="block text-sm font-medium text-slate-700 mb-1">Tipo de usuario <small
             class="p-error">*</small></label>
         <p-dropdown [options]="tipoUsuario" formControlName="codTipoUser" optionLabel="descripcion1"
-          optionValue="correlativo" placeholder="Seleccione tipo" (ngModelChange)="cambiarTipoUsuario()"
+          optionValue="correlativo" placeholder="Seleccione tipo" (onChange)="cambiarTipoUsuario()"
           [class]="formHelper.esClaseInvalido('codTipoUser')" class="w-full" />
         <small *ngIf="formHelper.esCampoInvalido('codTipoUser')" class="p-error">
           {{ formHelper.obtenerMensajeErrorDefecto() }}

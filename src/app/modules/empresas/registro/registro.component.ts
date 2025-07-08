@@ -161,7 +161,6 @@ export class RegistroComponent {
 
 
   request(): GuardarClienteRequest {
-    console.log(this.cliente)
     return {
       codEmpresa: this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0,
       cliente: this.form.get('cliente').value ?? null,

@@ -12,7 +12,7 @@ import { MensajesToastService } from '../../../shared/mensajes-toast.service';
 import { ParametroService } from '../../../service/parametro.service';
 import { AutenticacionService } from '../../../auth/autenticacion.service';
 import { UsuarioService } from '../../../service/usuario.service';
-import { catchError, EMPTY, finalize } from 'rxjs';
+import { catchError, EMPTY, finalize, firstValueFrom } from 'rxjs';
 import { ApiResponseCrud } from '../../../models/respuesta';
 import { ClienteService } from '../../../service/cliente.service';
 import { ClienteResponse, ListadoClientesResponse } from '../../../models/cliente/cliente.interface';
@@ -49,7 +49,7 @@ export class RegistroComponent {
     this.setearEstados()
     this.form = this.fb.group({
       usuario: [this.usuario?.usuario || null],
-      idEmpresa: [this.usuario?.codEmpresa || '', Validators.required],
+      idEmpresa: [this.usuario?.codigoEmpresa || '', Validators.required],
 
       codTipoUser: [this.usuario?.codTipoUser || '', [Validators.required]],
       codPerfil: [this.usuario?.codPerfil || null],
@@ -64,7 +64,7 @@ export class RegistroComponent {
       idEstado: [this.usuario?.idEstado ?? 1],
     });
 
-     
+
 
     // Inicializa la validación si ya hay valor cargado
     this.actualizarValidacionNdoc(this.form.get('codTipoDoc').value);
@@ -72,17 +72,16 @@ export class RegistroComponent {
 
   ngOnInit() {
     this.formHelper = new FormHelper(this.form);
-
+    this.cambiarTipoUsuario()
     if (this.usuario) {
 
     }
   }
 
-  cambiarTipoDoc(){
-   
-     const valor = this.form.get('codTipoDoc').value;
-      console.log("cambio" + valor)
-     this.actualizarValidacionNdoc(valor);
+  cambiarTipoDoc() {
+
+    const valor = this.form.get('codTipoDoc').value;
+    this.actualizarValidacionNdoc(valor);
   }
 
   actualizarValidacionNdoc(codTipoDoc: string | number) {
@@ -120,11 +119,11 @@ export class RegistroComponent {
       const idCliente = this.form.get('codCliente');
 
       if (tipoUser === 1) {
-        idPerfil?.setValidators(Validators.required);
-        idCliente?.clearValidators();
-      } else if (tipoUser === 2) {
         idCliente?.setValidators(Validators.required);
         idPerfil?.clearValidators();
+      } else if (tipoUser === 2) {
+        idPerfil?.setValidators(Validators.required);
+        idCliente?.clearValidators();
       } else {
         idPerfil?.clearValidators();
         idCliente?.clearValidators();
@@ -153,80 +152,84 @@ export class RegistroComponent {
     }
   }
 
-  cargarTipoUsuario(): void {
-    this.loading = true
-    this.parametroService.listado(1, PARAMETROS.MODULOS.MANTENIMIENTO,
-      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
-      PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_USUARIO).pipe(
-        catchError(error => {
-          this.mensajeToast.errorServicioConsulta(error);
-          return EMPTY;
-        }), finalize(() => { this.loading = false })
-      ).subscribe(response => {
-        if (response.codigo === 0) {
-          this.tipoUsuario = response.respuesta;
-        } else {
-          this.tipoUsuario = [];
-        }
-      });
+  async cargarTipoUsuario(): Promise<void> {
+    this.loading = true;
+    try {
+      const response = await firstValueFrom(this.parametroService.listado(
+        1,
+        PARAMETROS.MODULOS.MANTENIMIENTO,
+        PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
+        PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_USUARIO
+      ));
+      this.tipoUsuario = response.codigo === 0 ? response.respuesta : [];
+    } catch (error) {
+      this.mensajeToast.errorServicioConsulta(error);
+      this.tipoUsuario = [];
+    } finally {
+      this.loading = false;
+    }
   }
 
-  cargarPerfiles(): void {
-    this.loading = true
 
-    this.parametroService.listado(1, PARAMETROS.MODULOS.MANTENIMIENTO,
-      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
-      PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL).pipe(
-        catchError(error => {
-          this.mensajeToast.errorServicioConsulta(error);
-          return EMPTY;
-        }), finalize(() => { this.loading = false })
-      ).subscribe(response => {
-        if (response.codigo === 0) {
-          this.tipoPerfil = response.respuesta;
-        } else {
-          this.tipoPerfil = [];
-        }
-      });
+  async cargarPerfiles(): Promise<void> {
+    this.loading = true;
+    try {
+      const response = await firstValueFrom(this.parametroService.listado(
+        1,
+        PARAMETROS.MODULOS.MANTENIMIENTO,
+        PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
+        PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_PERFIL
+      ));
+      this.tipoPerfil = response.codigo === 0 ? response.respuesta : [];
+    } catch (error) {
+      this.mensajeToast.errorServicioConsulta(error);
+      this.tipoPerfil = [];
+    } finally {
+      this.loading = false;
+    }
   }
 
-  cargarClientes() {
-    this.loading = true
-    this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa).pipe(
-      catchError(error => {
-        this.mensajeToast.errorServicioConsulta(error);
-        return EMPTY;
-      }), finalize(() => { this.loading = false })
-    ).subscribe((response: ListadoClientesResponse) => {
-      const { respuesta, codigo } = response;
-      if (codigo === 0) this.empresas = respuesta
-      else this.empresas = []
 
-    });
+  async cargarClientes(): Promise<void> {
+    this.loading = true;
+    try {
+      const codigoEmpresa = this.autenticacionService.getDatosToken()?.codigoEmpresa;
+      const response = await firstValueFrom(this.clienteService.listado(codigoEmpresa));
+      this.empresas = response.codigo === 0 ? response.respuesta : [];
+    } catch (error) {
+      this.mensajeToast.errorServicioConsulta(error);
+      this.empresas = [];
+    } finally {
+      this.loading = false;
+    }
   }
 
-  cargarTipoDoc(): void {
-    this.loading = true
-    this.parametroService.listado(1, PARAMETROS.MODULOS.MANTENIMIENTO,
-      PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
-      PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_DOCUMENTO).pipe(
-        catchError(error => {
-          this.mensajeToast.errorServicioConsulta(error);
-          return EMPTY;
-        }), finalize(() => { this.loading = false })
-      ).subscribe(response => {
 
-        this.tipoDocumento = response.codigo === 0 && response.respuesta.length > 0 ? response.respuesta : [];
-
-      });
+  async cargarTipoDoc(): Promise<void> {
+    this.loading = true;
+    try {
+      const response = await firstValueFrom(this.parametroService.listado(
+        1,
+        PARAMETROS.MODULOS.MANTENIMIENTO,
+        PARAMETROS.MANTENIMIENTO.OPCIONES.USUARIOS,
+        PARAMETROS.MANTENIMIENTO.USUARIOS.TIPO_DOCUMENTO
+      ));
+      this.tipoDocumento = response.codigo === 0 ? response.respuesta : [];
+    } catch (error) {
+      this.mensajeToast.errorServicioConsulta(error);
+      this.tipoDocumento = [];
+    } finally {
+      this.loading = false;
+    }
   }
+
 
 
 
   request(): GuardarUsuarioRequest {
     return {
       idUsuario: this.form.get('usuario').value,
-      idEmpresa: this.autenticacionService.getDatosToken()?.codigoUsuario ?? 0,
+      idEmpresa: this.autenticacionService.getDatosToken()?.codigoEmpresa ?? 0,
       idCliente: this.form.get('codCliente').value,
       idTipoUser: this.form.get('codTipoUser').value,
       idPerfil: this.form.get('codPerfil').value,
@@ -243,6 +246,8 @@ export class RegistroComponent {
   }
 
   guardar() {
+    this.form.get('idEmpresa').setValue(this.autenticacionService.getDatosToken()?.codigoEmpresa)
+
     if (this.form.valid) {
       this.loading = true
       this.usuarioService.registrar(this.request()).pipe(

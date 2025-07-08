@@ -25,7 +25,6 @@ export class AppMenu {
 
     ngOnInit() {
         const codPerfil = this.autenticacionService.obtenerCodTipoUsuario(); // o desde tu servicio
-        console.log(codPerfil)
         if (codPerfil == 1) { //EXTERNO
             this.model = [
                 {

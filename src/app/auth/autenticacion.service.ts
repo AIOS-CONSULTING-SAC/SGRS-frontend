@@ -98,6 +98,14 @@ export class AutenticacionService {
     return ''
   }
 
+  obtenerPerfil(): string {
+    const tokenPayload = this.decodeToken()
+    if (tokenPayload) {
+      return `${tokenPayload.perfil}`
+    }
+    return ''
+  }
+
   obtenerCodUsuario(): number | null {
     const tokenPayload = this.decodeToken()
     if (tokenPayload) {
@@ -162,4 +170,5 @@ type TokenPayload = {
   nombres: string
   apellidoP: string
   apellidoM: string
+  perfil?: string
 }

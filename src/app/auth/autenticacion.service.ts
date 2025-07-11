@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http'
 import { HttpService } from '../shared/http.service'
 import { IniciarSesionRequest } from '../models/usuario/usuario.interface'
 import { MensajesToastService } from '../shared/mensajes-toast.service'
+import { environment } from '../../environments/environment'
 
 const apiServicio = 'api/v1/usuarios/'
 
@@ -47,6 +48,10 @@ export class AutenticacionService {
      // this.usuarioSesion.next(null)
     }
    
+  }
+
+  obtenerVersion(){
+    return environment.version
   }
 
   obtenerToken(): string | null {

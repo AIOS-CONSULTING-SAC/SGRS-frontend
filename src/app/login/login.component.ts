@@ -38,6 +38,10 @@ export class LoginComponent {
     )
   }
 
+  get version(){
+    return this.autenticacionService.obtenerVersion()
+  }
+
   cmdLogin() {
     const request: IniciarSesionRequest = {
       usuario: this.email,

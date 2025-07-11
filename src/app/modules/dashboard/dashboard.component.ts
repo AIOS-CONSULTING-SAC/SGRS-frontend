@@ -399,7 +399,7 @@ export class DashboardComponent {
       ),
       locales: this.localService.listado(this.obtenerCodCliente(), '', 1),
       residuos: this.residuosService.listado(this.obtenerCodCliente(), '', 1),
-      empresas: this.clienteService.listado(this.obtenerCodCliente(), "", "", 1),
+      empresas: this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, "", "", 1),
     })
       .pipe(
         catchError(error => {

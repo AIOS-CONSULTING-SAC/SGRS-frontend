@@ -430,7 +430,7 @@ export class DashboardComponent {
   }
 
   buscar() {
-    if(this.idCliente== null){
+    if(this.obtenerCodCliente() == null || this.obtenerCodCliente() == 0){
       this.mensajeService.advertencia('Validación','Debe seleccionar una empresa.')
       return
     }

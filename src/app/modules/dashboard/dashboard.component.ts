@@ -435,7 +435,7 @@ export class DashboardComponent {
       return
     }
 
-    if(this.idAnio){
+    if(this.idAnio == null){
       this.mensajeService.advertencia('Validación','Debe especificar año.')
       return
     }

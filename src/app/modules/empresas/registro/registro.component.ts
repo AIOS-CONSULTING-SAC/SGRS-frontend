@@ -49,12 +49,12 @@ export class RegistroComponent {
         Validators.maxLength(15),
         rucValidator
       ]],
-      razonSocial: [this.cliente?.razonSocial || '', [Validators.required,  Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(100)]],
-      nombreComercial: [this.cliente?.nombreComercial || '', [Validators.required,  Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(100)]],
+      razonSocial: [this.cliente?.razonSocial || '', [Validators.required,  Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]+$/), Validators.maxLength(100)]],
+      nombreComercial: [this.cliente?.nombreComercial || '', [Validators.required,  Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]+$/), Validators.maxLength(100)]],
       idDepartamento: ['', Validators.required],
       idProvincia: ['', Validators.required],
       idDistrito: ['', Validators.required],
-      direccion: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/),Validators.maxLength(400)]],
+      direccion: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]+$/),Validators.maxLength(400)]],
       idEstado: [''], 
     });
 

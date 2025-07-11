@@ -54,7 +54,6 @@ export interface ResumenResiduos {
 })
 export class DashboardComponent {
   chartPlugins = [ChartDataLabels];
-  filtroForm!: FormGroup;
   empresas: ClienteResponse[] = [];
   anios: ParametroResponse[] = [];
   meses: any[] = MESES;
@@ -141,7 +140,7 @@ export class DashboardComponent {
 
   listarGraficoVertical() {
     this.dashboardService.listarGraficoVertical(
-      this.esCliente() ? this.autenticacionService.getDatosToken()?.codigoEmpresa || 0 : this.idCliente,
+       this.obtenerCodCliente(),
       this.idAnio || 0,
       this.idLocales,
       this.idMeses,
@@ -398,9 +397,9 @@ export class DashboardComponent {
         PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
         PARAMETROS.MANTENIMIENTO.EMPRESAS.ANIOS
       ),
-      locales: this.localService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, '', 1),
-      residuos: this.residuosService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, '', 1),
-      empresas: this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, "", "", 1),
+      locales: this.localService.listado(this.obtenerCodCliente(), '', 1),
+      residuos: this.residuosService.listado(this.obtenerCodCliente(), '', 1),
+      empresas: this.clienteService.listado(this.obtenerCodCliente(), "", "", 1),
     })
       .pipe(
         catchError(error => {
@@ -417,14 +416,29 @@ export class DashboardComponent {
       });
   }
   limpiar() {
-    this.filtroForm.reset();
+    this.idAnio =  null;
+    this.idMeses = null;
+    this.idLocales = null;
+    this.idResiduos = null
+    this.idCliente = null
     this.dataResumen = [];
+    this.graficoResiduos = []
     this.chartOptions.labels = [];
     this.chartOptions.datasets[0].data = [];
+   
 
   }
 
   buscar() {
+    if(this.idCliente== null){
+      this.mensajeService.advertencia('Validación','Debe seleccionar una empresa.')
+      return
+    }
+
+    if(this.idAnio){
+      this.mensajeService.advertencia('Validación','Debe especificar año.')
+      return
+    }
     this.listarGraficoBarra()
     this.listarGraficoVertical()
   }

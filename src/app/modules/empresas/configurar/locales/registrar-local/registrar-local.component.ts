@@ -43,8 +43,8 @@ export class RegistrarLocalComponent implements OnInit {
      this.form = this.fb.group({
       local: [null],
       codCliente: [this.cliente?.cliente],
-      nombre: ['', [Validators.required,Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(100)]],
-      direccion: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/), Validators.maxLength(400)]],
+      nombre: ['', [Validators.required,Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]+$/), Validators.maxLength(100)]],
+      direccion: ['', [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]+$/), Validators.maxLength(400)]],
       idEstado: [1,Validators.required],  
     });
   }

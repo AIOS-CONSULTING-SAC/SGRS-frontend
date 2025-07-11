@@ -13,7 +13,7 @@ import { ListadoLocalesEmpresaResponse } from '../../models/local/local.interfac
 import { catchError, EMPTY, finalize, forkJoin, Observable } from 'rxjs';
 import { MensajesToastService } from '../../shared/mensajes-toast.service';
 import { TabViewModule } from 'primeng/tabview';
-import { Chart } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData } from 'chart.js';
 import 'chartjs-plugin-datalabels';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ListadoParametrosResponse, ParametroResponse } from '../../models/parametro/parametro.interface';
@@ -25,6 +25,7 @@ import { ClienteService } from '../../service/cliente.service';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
+import { LoadingComponent } from '../../shared/loading/loading.component';
 
 
 export interface FiltroResiduos {
@@ -46,7 +47,7 @@ export interface ResumenResiduos {
 @Component({
   selector: 'app-dashboard',
   imports: [ReactiveFormsModule, FormsModule, DropdownModule,
-    ButtonModule, CommonModule, TabViewModule, ChartModule,
+    ButtonModule, CommonModule, TabViewModule, ChartModule, LoadingComponent,
     MultiSelectModule, ProgressBarModule, CardModule, PanelModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -61,8 +62,6 @@ export class DashboardComponent {
   loading: boolean = false;
   dataResumen: ResumenResiduos[] = [];
   residuos: any[] = [];
-  chartLocalesData: any;
-  chartLocalesOptions!: any;
   chartResiduosData: any;
   chartOptions: any;
   idCliente: any;
@@ -73,6 +72,8 @@ export class DashboardComponent {
   graficoResiduos!: any[]
   chartData: any;
   chartStackedOptions = {};
+  donutData!: ChartData<'doughnut'>;
+  donutOptions!: ChartConfiguration<'doughnut'>['options'];
   constructor(private fb: FormBuilder, private localService: LocalService,
     private residuosService: ResiduoService,
     private autenticacionService: AutenticacionService,
@@ -84,7 +85,7 @@ export class DashboardComponent {
 
   }
 
-   cambiarCliente() {
+  cambiarCliente() {
     this.listarLocales()
   }
 
@@ -92,8 +93,8 @@ export class DashboardComponent {
     this.loading = true;
 
     forkJoin({
-      locales: this.localService.listado(this.obtenerCodCliente(),'', 1),
-       residuos: this.residuosService.listado(this.obtenerCodCliente(),'', 1),
+      locales: this.localService.listado(this.obtenerCodCliente(), '', 1),
+      residuos: this.residuosService.listado(this.obtenerCodCliente(), '', 1),
     })
       .pipe(
         catchError(error => {
@@ -106,24 +107,25 @@ export class DashboardComponent {
 
         this.localesFiltro = locales.codigo === 0 ? locales.respuesta : [];
         this.residuos = residuos.codigo === 0 ? residuos.respuesta : [];
-        this.idLocales = []
-        this.idResiduos = []
+        this.idLocales = null
+        this.idResiduos = null
       });
   }
 
-  obtenerCodCliente(){
+  obtenerCodCliente() {
     return this.esCliente() ? this.autenticacionService.getDatosToken()?.cliente || 0 : this.idCliente;
   }
 
 
 
   listarGraficoBarra() {
+    this.loading = true
     this.dashboardService.listarGraficoBarra(
       this.obtenerCodCliente(),
       this.idAnio || 0,
-      this.idLocales,
-      this.idMeses,
-      this.idResiduos
+      this.idLocales ?? this.localesFiltro.map(r => r.local).join(','),
+      this.idMeses ?? this.meses.map(r => r.value).join(','),
+      this.idResiduos ?? this.residuos.map(r => r.residuo).join(','),
     ).pipe(
       catchError((error) => {
         this.mensajeService.errorServicioConsulta(error);
@@ -223,8 +225,72 @@ export class DashboardComponent {
     }
   }
 
+  private buildChartDona(data: any[]) {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--text-color');
+    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    const filtered = data.filter(r => r.totalAnio > 0);
+    //Preparar labels y valores
+    const labels = filtered.map(r => r.descResiduo);
+    const values = filtered.map(r => r.totalAnio);
+
+    //Generar colores dinámicos
+    const colors = this.generateColors(values.length);
+
+    this.donutData = {
+      labels,
+      datasets: [
+        {
+          data: values,
+          backgroundColor: colors,
+          hoverOffset: 4
+        }
+      ]
+    };
+
+    this.donutOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        datalabels: {
+          color: '#FFFFFF',        // Blanco; cámbialo a tu color corporativo
+          font: {
+            weight: 'bold',
+            size: 12
+          }
+        },
+        legend: {
+          position: 'bottom',
+          labels: {
+            boxWidth: 14,
+            padding: 16,
+            font: { size: 12 }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx =>
+              `${ctx.label}: ${Number(ctx.raw).toLocaleString()}`
+          }
+        }
+      }
+    };
+  }
+
+  private generateColors(count: number): string[] {
+    const colors: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const hue = Math.round((360 / count) * i); // 0‑360°
+      colors.push(`hsl(${hue}, 70%, 60%)`);
+    }
+    return colors;
+  }
+
   getStackedBarChartData() {
     this.setearChartOpciones()
+    this.buildChartDona(this.graficoResiduos)
     const locales = this.getLocalesAgrupados();
     const residuos = this.graficoResiduos.map(r => r.descResiduo);
     const baseColor = this.generatePastelColors(this.graficoResiduos.length);
@@ -242,16 +308,6 @@ export class DashboardComponent {
     };
   }
 
-  applyAlphaToHex(hex: string, alpha: number): string {
-    // Convierte "#2196f3" a rgba
-    if (!hex.startsWith('#')) return hex;
-
-    const bigint = parseInt(hex.slice(1), 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    return `rgba(${r}, ${g}, ${b}, ${Math.min(Math.max(alpha, 0.1), 1)})`;
-  }
 
   getLocalesAgrupados(): LocalAgrupado[] {
     if (!this.graficoResiduos?.length) return [];
@@ -312,34 +368,9 @@ export class DashboardComponent {
     return Math.round((valor / total) * 100);
   }
 
-  setDataPrueba() {
-    this.dataResumen = [
-      { nombrePlanta: 'Ancón', total: 22.13 },
-      { nombrePlanta: 'Carapongo', total: 93.12 },
-      { nombrePlanta: 'Cieneguilla', total: 184.16 },
-      { nombrePlanta: 'Huascat', total: 297.87 },
-      { nombrePlanta: 'José Gálvez', total: 204.85 },
-      { nombrePlanta: 'Julio C. Tello', total: 933.33 },
-      { nombrePlanta: 'Manchay', total: 4_118.94 },
-      { nombrePlanta: 'Pucusana', total: 1.05 },
-      { nombrePlanta: 'Punta Hermosa', total: 7_336 },
-      { nombrePlanta: 'San Antonio de Carapongo', total: 0.88 },
-      { nombrePlanta: 'Punto A', total: 1_928.24 },
-      { nombrePlanta: 'San Bartolo de Carapongo', total: 3_083.46 },
-      { nombrePlanta: 'San Bartolo Norte', total: 117.76 },
-      { nombrePlanta: 'San Bartolo Sur', total: 20_181.79 },
-      { nombrePlanta: 'San Juan de Lurigancho', total: 9_573.09 },
-      { nombrePlanta: 'Santa Clara', total: 34.12 },
-      { nombrePlanta: 'Santa Rosa', total: 15_717.67 },
-      { nombrePlanta: 'Ventanilla', total: 1_502.05 },
-      { nombrePlanta: 'Santa María 1 y 2', total: 0.82 },
-    ]
-  }
+
   ngOnInit() {
-    this.setDataPrueba();
-    this.setChartLocales();
     this.cargarFiltrosIniciales();
-    this.setChartResiduos()
   }
 
   downloadChart() {
@@ -353,105 +384,8 @@ export class DashboardComponent {
     }
   }
 
-  setChartLocales() {
-    this.chartLocalesData = {
-      labels: this.dataResumen.map(p => p.nombrePlanta),
-      datasets: [
-        {
-          label: 'Total de Residuos',
-          backgroundColor: '#7CB342',
-          data: this.dataResumen.map(p => p.total),
-          borderRadius: 4,
-          barThickness: 35
-        }
-      ]
-    };
-
-    this.chartOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: 'x', // o 'y' para horizontal
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            label: (context: any) => `${context.dataset.label}: ${context.formattedValue}`
-          }
-        },
-        title: {
-          display: true,
-          text: 'TOTAL DE RESIDUOS POR LOCAL',
-          font: {
-            size: 18
-          }
-        },
-        datalabels: {
-          display: true,
-          anchor: 'end',
-          align: 'top',
-          color: '#000',
-          formatter: (value: number) => `${value} t`,
-          font: {
-            weight: 'bold',
-            size: 12
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            autoSkip: false,
-            maxRotation: 45,
-            minRotation: 45
-          }
-        },
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Toneladas'
-          }
-        }
-      }
-    };
-
-  }
-
-  formatNumber(value: number): string {
-    return new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value);
-  }
-
   esCliente() {
     return this.autenticacionService.getDatosToken()?.tipoUsuario == 1
-  }
-
-
-  setChartResiduos() {
-
-    this.chartResiduosData = {
-      labels: ['Arenas', 'Grasas', 'Lodos', 'Maleza y poda', 'Sólidos flotantes'],
-      datasets: [{
-        data: [8283.84, 3175.19, 73246.74, 83.59, 780.34],
-        backgroundColor: ['#F37120', '#07A7E3', '#FFD700', '#E34234', '#6A0DAD']
-      }]
-    };
-
-    this.chartOptions = {
-      cutout: '60%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: '#000'
-          }
-        }
-      }
-    };
   }
 
   cargarFiltrosIniciales() {
@@ -464,8 +398,8 @@ export class DashboardComponent {
         PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
         PARAMETROS.MANTENIMIENTO.EMPRESAS.ANIOS
       ),
-      locales: this.localService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa,'', 1),
-      residuos: this.residuosService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa,'', 1),
+      locales: this.localService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, '', 1),
+      residuos: this.residuosService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, '', 1),
       empresas: this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, "", "", 1),
     })
       .pipe(

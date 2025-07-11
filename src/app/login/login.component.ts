@@ -10,10 +10,13 @@ import { IniciarSesionRequest } from '../models/usuario/usuario.interface';
 import { AutenticacionService } from '../auth/autenticacion.service';
 import { MensajesToastService } from '../shared/mensajes-toast.service';
 import { BehaviorSubject } from 'rxjs';
+import { LoadingComponent } from '../shared/loading/loading.component';
 
 @Component({
   selector: 'app-login',
-  imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule],
+  imports: [ButtonModule, CheckboxModule, InputTextModule, 
+    LoadingComponent,
+    PasswordModule, FormsModule, RouterModule, RippleModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -22,6 +25,7 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   checked: boolean = false;
+  loading: boolean = false;
   constructor(private autenticacionService: AutenticacionService,
     private mensajeToast: MensajesToastService,
 
@@ -39,10 +43,11 @@ export class LoginComponent {
       usuario: this.email,
       password: this.password
     };
-
+    this.loading = true
     this.autenticacionService.iniciarSesion(request).subscribe({
       next: (response: any) => {
         if (response.codigo === 200) {
+          this.loading = false
           const { accessToken, refreshToken } = response.respuesta;
           localStorage.setItem('accessToken', accessToken);
           localStorage.setItem('refreshToken', refreshToken); 
@@ -55,7 +60,7 @@ export class LoginComponent {
         }
       },
       error: (error: any) => {
-        console.error(error);
+          this.loading = false
         this.mensajeToast.error('Error de servicio', error.message || 'No se pudo conectar al servidor.');
       }
     });

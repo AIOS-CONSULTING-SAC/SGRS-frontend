@@ -9,7 +9,7 @@ import { RippleModule } from 'primeng/ripple';
 import { IniciarSesionRequest } from '../models/usuario/usuario.interface';
 import { AutenticacionService } from '../auth/autenticacion.service';
 import { MensajesToastService } from '../shared/mensajes-toast.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, finalize } from 'rxjs';
 import { LoadingComponent } from '../shared/loading/loading.component';
 
 @Component({
@@ -48,24 +48,33 @@ export class LoginComponent {
       password: this.password
     };
     this.loading = true
-    this.autenticacionService.iniciarSesion(request).subscribe({
+    this.autenticacionService.iniciarSesion(request)
+    .pipe(
+      finalize(() => this.loading = false) 
+    )
+    .subscribe({
       next: (response: any) => {
         if (response.codigo === 200) {
-          this.loading = false
           const { accessToken, refreshToken } = response.respuesta;
-          localStorage.setItem('accessToken', accessToken);
-          localStorage.setItem('refreshToken', refreshToken); 
+          localStorage.setItem('accessToken',  accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+
           this.mensajeToast.exito('Bienvenido', 'Inicio de sesión exitoso');
 
           const returnUrl = this.route.snapshot.queryParams['returnUrl'];
           this.router.navigateByUrl(returnUrl || '/dashboard');
         } else {
-          this.mensajeToast.error('Fallo al iniciar sesión', response.mensaje || 'Credenciales incorrectas');
+          this.mensajeToast.error(
+            'Fallo al iniciar sesión',
+            response.mensaje || 'Credenciales incorrectas'
+          );
         }
       },
       error: (error: any) => {
-          this.loading = false
-        this.mensajeToast.error('Error de servicio', error.message || 'No se pudo conectar al servidor.');
+        this.mensajeToast.error(
+          'Error de servicio',
+          error?.message || 'No se pudo conectar al servidor.'
+        );
       }
     });
   }

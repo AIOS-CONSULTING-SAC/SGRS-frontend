@@ -1,21 +1,22 @@
-<div class="p-4">
+<div>
     <h3 class="text-lg font-semibold text-slate-900 mb-4">Dashboard</h3>
     <div class="grid grid-cols-12 gap-4 mb-6">
         <div class="col-span-12 md:col-span-6 xl:col-span-4" *ngIf="!esCliente()">
-            <label class="block text-sm font-medium text-slate-700 mb-1">Empresa <small class="p-error">*</small></label>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Empresa <small
+                    class="p-error">*</small></label>
             <p-dropdown placeholder="Especifique cliente" [(ngModel)]="idCliente" [options]="empresas"
                 optionLabel="nombreComercial" (onChange)="cambiarCliente()" optionValue="cliente" class="w-full" />
         </div>
         <div class="col-span-12 md:col-span-6 xl:col-span-2">
             <label class="block text-sm font-medium text-slate-700 mb-1">Año <small class="p-error">*</small></label>
-            <p-dropdown placeholder="Especifique año" [(ngModel)]="idAnio" [options]="anios"
-                optionLabel="descripcion1" optionValue="entero01" class="w-full" />
+            <p-dropdown placeholder="Especifique año" [(ngModel)]="idAnio" [options]="anios" optionLabel="descripcion1"
+                optionValue="entero01" class="w-full" />
         </div>
 
         <div class="col-span-12 md:col-span-6 xl:col-span-3">
             <label class="block text-sm font-medium text-slate-700 mb-1">Mes</label>
-            <p-multi-select placeholder="Especifique mes" [(ngModel)]="idMeses" optionLabel="label"
-                optionValue="value" [options]="meses" class="w-full" />
+            <p-multi-select placeholder="Especifique mes" [(ngModel)]="idMeses" optionLabel="label" optionValue="value"
+                [options]="meses" class="w-full" />
         </div>
 
         <div class="col-span-12 md:col-span-6 xl:col-span-3">
@@ -40,60 +41,81 @@
             [style]="{'min-width': '130px'}"></button>
 
     </div>
-    <p-tabView>
-        <p-tabpanel header="TOTAL DE RESIDUOS POR PTAR">
-            <div *ngIf="graficoResiduos && graficoResiduos.length>0">
-                <div class="w-full overflow-x-auto">
-                    <div class="flex flex-wrap justify-center gap-4 min-w-full"
-                        [ngClass]="{ 'justify-start': graficoResiduos.length > 5 }">
-                        <div *ngFor="let item of graficoResiduos" class="flex flex-col gap-3 w-80 shrink-0">
+    <p-tabs value="0" scrollable>
+        <p-tablist>
 
-                            <!-- Panel superior -->
-                            <div class="rounded-xl border border-gray-400 px-4 py-3 bg-white shadow-sm">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="font-bold text-black">SUBTOTAL</span>
-                                    <span class="font-bold text-teal-700 uppercase">{{ item.descResiduo }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xl font-semibold text-gray-900">{{ item.totalAnio
-                                        }}</span>
-                                    <span class="text-sm font-bold text-red-600 uppercase">{{ item.descUnidad }}</span>
-                                </div>
-                            </div>
 
-                            <div class="rounded-xl border border-gray-400 p-4 bg-white shadow-sm">
-                                <div class="text-center font-semibold text-base mb-4">TOP 5 Locales con más generación
-                                </div>
-                                <div *ngFor="let local of item.detalleDashboard.slice(0, 5)" class="mb-4">
-                                    <div class="flex justify-between text-sm font-medium mb-1">
-                                        <span class="truncate">{{ local.descLocal }}</span>
-                                        <span class="text-teal-700 font-semibold">{{ local.total 
+            <ng-template #previcon>
+                <i class="pi pi-minus"></i>
+            </ng-template>
+            <p-tab value="0" class="flex items-center !gap-2">
+                TOTAL DE RESIDUOS POR PTAR
+            </p-tab>
+
+            <p-tab value="1" class="flex items-center !gap-2" >
+              TIPOS DE RESIDUOS SOLIDOS
+            </p-tab>
+            <ng-template #nexticon>
+                <i class="pi pi-plus"></i>
+            </ng-template>
+
+        </p-tablist>
+        <p-tabpanels>
+            <p-tabpanel value="0">
+                <div *ngIf="graficoResiduos && graficoResiduos.length>0">
+                    <div class="w-full overflow-x-auto">
+                        <div class="flex flex-wrap justify-center gap-4 min-w-full"
+                            [ngClass]="{ 'justify-start': graficoResiduos.length > 5 }">
+                            <div *ngFor="let item of graficoResiduos" class="flex flex-col gap-3 w-80 shrink-0">
+
+                                <!-- Panel superior -->
+                                <div class="rounded-xl border border-gray-400 px-4 py-3 bg-white shadow-sm">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-bold text-black">SUBTOTAL</span>
+                                        <span class="font-bold text-teal-700 uppercase">{{ item.descResiduo }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xl font-semibold text-gray-900">{{ item.totalAnio
+                                            }}</span>
+                                        <span class="text-sm font-bold text-red-600 uppercase">{{ item.descUnidad
                                             }}</span>
                                     </div>
-
-                                    <p-progressBar [value]="getPorcentaje(local.total, item.totalAnio)"
-                                        [style]="{ height: '6px' }" [showValue]="false"
-                                        styleClass="w-full h-3 rounded-full bg-gray-200">
-                                    </p-progressBar>
                                 </div>
-                            </div>
 
+                                <div class="rounded-xl border border-gray-400 p-4 bg-white shadow-sm">
+                                    <div class="text-center font-semibold text-base mb-4">TOP 5 Locales con más
+                                        generación
+                                    </div>
+                                    <div *ngFor="let local of item.detalleDashboard.slice(0, 5)" class="mb-4">
+                                        <div class="flex justify-between text-sm font-medium mb-1">
+                                            <span class="truncate">{{ local.descLocal }}</span>
+                                            <span class="text-teal-700 font-semibold">{{ local.total
+                                                }}</span>
+                                        </div>
+
+                                        <p-progressBar [value]="getPorcentaje(local.total, item.totalAnio)"
+                                            [style]="{ height: '6px' }" [showValue]="false"
+                                            styleClass="w-full h-3 rounded-full bg-gray-200">
+                                        </p-progressBar>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </p-tabpanel>
-
-        <p-tabpanel header="TIPOS DE RESIDUOS SOLIDOS">
-            <div class="grid p-3">
-                <!-- <p-chart *ngIf="chartData" type="bar" [data]="chartData" [options]="chartOptions"
+            </p-tabpanel>
+            <p-tabpanel value="1">
+                  <div class="grid p-3">
+                    <!-- <p-chart *ngIf="chartData" type="bar" [data]="chartData" [options]="chartOptions"
                     styleClass="w-full h-[400px]">
                 </p-chart> -->
-                <p-chart *ngIf="graficoResiduos?.length" type="doughnut" [data]="donutData"
-                    [options]="donutOptions" styleClass="w-full h-30rem">
-                </p-chart>
-            </div>
-        </p-tabpanel>
-    </p-tabView>
+                    <p-chart *ngIf="graficoResiduosDona?.length" type="doughnut" [data]="donutData" [options]="donutOptions"
+                        styleClass="w-full h-30rem">
+                    </p-chart>
+                </div>
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
 </div>
 <app-loading [show]="loading"></app-loading>

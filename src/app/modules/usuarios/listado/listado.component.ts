@@ -108,6 +108,8 @@ export class ListadoComponent {
 
   cambiarTipoUsuario() {
     this.usuarios =[]
+    this.idTipoPerfil = ''
+    this.empresa = ''
   }
 
   buscar() {

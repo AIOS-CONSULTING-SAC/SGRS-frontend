@@ -46,8 +46,8 @@ export interface ResumenResiduos {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ReactiveFormsModule, FormsModule, DropdownModule,
-    ButtonModule, CommonModule, TabViewModule, ChartModule, LoadingComponent,
+  imports: [ReactiveFormsModule, FormsModule, DropdownModule,TabsModule,
+    ButtonModule, CommonModule, ChartModule, LoadingComponent,
     MultiSelectModule, ProgressBarModule, CardModule, PanelModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -69,6 +69,7 @@ export class DashboardComponent {
   idLocales!: any;
   idResiduos!: any;
   graficoResiduos!: any[]
+  graficoResiduosDona!: any[]
   chartData: any;
   chartStackedOptions = {};
   donutData!: ChartData<'doughnut'>;
@@ -142,9 +143,9 @@ export class DashboardComponent {
     this.dashboardService.listarGraficoVertical(
        this.obtenerCodCliente(),
       this.idAnio || 0,
-      this.idLocales,
-      this.idMeses,
-      this.idResiduos
+      this.idLocales ?? this.localesFiltro.map(r => r.local).join(','),
+      this.idMeses ?? this.meses.map(r => r.value).join(','),
+      this.idResiduos ?? this.residuos.map(r => r.residuo).join(','),
     ).pipe(
       catchError((error) => {
         this.mensajeService.errorServicioConsulta(error);
@@ -153,7 +154,8 @@ export class DashboardComponent {
       finalize(() => (this.loading = false))
     )
       .subscribe((res: any) => {
-        // this.residuos = res.codigo === 0 ? res.respuesta : [];
+         this.graficoResiduosDona = res.codigo === 0 ? res.respuesta : [];
+         this.buildChartDona(this.graficoResiduosDona)
       });
   }
 
@@ -254,7 +256,9 @@ export class DashboardComponent {
       cutout: '60%',
       plugins: {
         datalabels: {
-          color: '#FFFFFF',        // Blanco; cámbialo a tu color corporativo
+          color: '#FFFFFF', 
+          clamp: true,
+          formatter: (v) => v.toLocaleString('es-PE', { maximumFractionDigits: 3 }),
           font: {
             weight: 'bold',
             size: 12
@@ -289,7 +293,6 @@ export class DashboardComponent {
 
   getStackedBarChartData() {
     this.setearChartOpciones()
-    this.buildChartDona(this.graficoResiduos)
     const locales = this.getLocalesAgrupados();
     const residuos = this.graficoResiduos.map(r => r.descResiduo);
     const baseColor = this.generatePastelColors(this.graficoResiduos.length);
@@ -303,7 +306,7 @@ export class DashboardComponent {
 
     this.chartData = {
       labels: locales.map(loc => loc.descLocal),
-      datasets
+      datasets: datasets
     };
   }
 

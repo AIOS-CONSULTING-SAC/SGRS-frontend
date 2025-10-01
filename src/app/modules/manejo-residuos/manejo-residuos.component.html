@@ -59,7 +59,8 @@
         </div>
     </form>
     <p-table #table [value]="residuosPorLocal" class="tabla-locales" [size]="'small'" dataKey="codLocal"
-        [expandedRowKeys]="expandedRows" >
+        [expandedRowKeys]="expandedRows" [paginator]="true" [rows]="15" [rowsPerPageOptions]="[5,10,20]"
+        [responsiveLayout]="'stack'" >
         <ng-template pTemplate="header">
             <tr>
                 <th style="width: 3rem"></th>
@@ -83,7 +84,7 @@
                 <td colspan="7">
                     <div class="p-3">
                         <p-table [value]="local.residuos" class="tabla-residuos" [size]="'small'" dataKey="codResiduo"
-                            [scrollable]="true" [responsiveLayout]="'stack'">
+                            [scrollable]="true" [responsiveLayout]="'stack'"  [paginator]="true" [rows]="15" [rowsPerPageOptions]="[5,10,20]">
                             <ng-template pTemplate="header">
             <tr>
                 <th pFrozenColumn>Descripción</th>

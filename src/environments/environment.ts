@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   version: 'v1.0.0beta4',
   apiRest: {
-    host: 'https://api-backend-sgrs.isosegperu.com'
+    host: 'http://localhost:3000'
   }
 }
 

@@ -89,13 +89,18 @@ export class ManejoResiduosComponent {
         idEstado,
       }))
       .filter(req => req.detalle.length > 0);
-
+    
+    if(requests?.length==0){
+        this.mensajeService.advertencia('Error al guardar', 'No hay cambios para guardar');
+        return;
+    }
     this.loading = true;
 
     const observables = requests.map(req =>
       this.menajoResiduoService.registrar(req).pipe(
         catchError(err => {
           const mensaje = this.obtenerMensajeDeError(err, req);
+          this.loading = false;
           this.mensajeService.error('Error al guardar', mensaje);
           return of(null);
         })

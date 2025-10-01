@@ -33,7 +33,7 @@ export class CustomHttpInterceptor implements HttpInterceptor {
 
     return next.handle(clonedReq).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 403) {
+        if (error.status === 401) {
           return this.handle401Error(req, next, contentType)
         }
         return throwError(error)
@@ -75,7 +75,7 @@ export class CustomHttpInterceptor implements HttpInterceptor {
           }
         }),
         catchError((refreshError: any) => {
-          if (refreshError.status === 403) {
+          if (refreshError.status === 401) {
             this.handleRefreshTokenFailure() // Siempre manejar el fallo aquí
           }
           return throwError(() => refreshError)

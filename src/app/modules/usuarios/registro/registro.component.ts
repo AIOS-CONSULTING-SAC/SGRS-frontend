@@ -257,7 +257,7 @@ export class RegistroComponent {
         }), finalize(() => { this.loading = false })
       ).subscribe((response: ApiResponseCrud) => {
         const { respuesta, codigo, mensaje } = response;
-        if (codigo === 0 && respuesta == '200') {
+        if (codigo === 0 ) {
           this.mensajeToast.exito('Éxito', mensaje)
           this.volver.emit();
         } else {

@@ -68,3 +68,8 @@
   white-space: nowrap;
   font-size: 0.9rem;
 }
+
+p-chart canvas {
+  height: 100% !important;
+  width: 100% !important;
+}

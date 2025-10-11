@@ -25,7 +25,7 @@ import { ClienteService } from '../../service/cliente.service';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
-import { LoadingComponent } from '../../shared/loading/loading.component'; 
+import { LoadingComponent } from '../../shared/loading/loading.component';
 Chart.register(ChartDataLabels);
 
 export interface FiltroResiduos {
@@ -229,124 +229,153 @@ export class DashboardComponent {
     }
   }
 
- private buildChartBarras(data: any[]) {
-  const documentStyle = getComputedStyle(document.documentElement);
-  const textColor = documentStyle.getPropertyValue('--text-color');
+  private buildChartBarras(data: any[]) {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--text-color') || '#000000';
+    const labels = data.map(r => r.descResiduo);
+    const values = data.map(r => r.totalAnio);
+    const colors = this.generateColors(values.length);
 
-  const filtered = data.filter(r => parseFloat(r.totalAnio) > 0);
+    this.barData = {
+      labels,
+      datasets: [
+        {
+          label: 'Total anual',
+          data: values,
+          backgroundColor: colors,
 
-  const labels = filtered.map(r => r.descResiduo);
-  const values = filtered.map(r => parseFloat(r.totalAnio));
-  const colors = this.generateColors(values.length);
+          barThickness: 5, // 🔸 grosor fijo para una separación más clara,
+          //padding:15
 
-  this.barData = {
-    labels,
-    datasets: [
-      {
-        label: 'Cantidad por Residuo',
-        data: values,
-        backgroundColor: colors
-      }
-    ]
-  };
-
-  this.barOptions = {
-    indexAxis: 'y', // Barras horizontales
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (ctx:any) => `${ctx.label}: ${Number(ctx.raw).toLocaleString('es-PE')}`
         }
-      }
-    },
-    scales: {
-      x: {
-        ticks: { color: textColor },
-        title: {
-          display: true,
-          text: 'Cantidad',
-          color: textColor
-        }
+      ]
+    };
+
+    this.barOptions = {
+      indexAxis: 'y', // Barras horizontales
+      responsive: false,
+      maintainAspectRatio: false,
+      layout: {
+        padding: { top: 10, bottom: 10, left: 10, right: 10 }
       },
-      y: {
-        ticks: { color: textColor },
-        title: {
-          display: true,
-          text: 'Tipo de Residuo',
-          color: textColor
-        }
-      }
-    }
-  };
-}
+      elements: {
 
-
-
- private buildChartDona(data: any[]) {
-  const minValueToDisplay = 1; // Valor mínimo para mostrar individualmente
-  const documentStyle = getComputedStyle(document.documentElement);
-
-  const filtered = data.filter(r => parseFloat(r.totalAnio) > 0);
-
-  // Separar valores relevantes y otros
-  const aboveThreshold = filtered.filter(r => parseFloat(r.totalAnio) > minValueToDisplay);
-  const belowThreshold = filtered.filter(r => parseFloat(r.totalAnio) <= minValueToDisplay);
-
-  const otherTotal = belowThreshold.reduce((sum, r) => sum + parseFloat(r.totalAnio), 0);
-
-  const labels = [...aboveThreshold.map(r => r.descResiduo), ...(otherTotal > 0 ? ['Otros'] : [])];
-  const values = [...aboveThreshold.map(r => parseFloat(r.totalAnio)), ...(otherTotal > 0 ? [otherTotal] : [])];
-
-  const colors = this.generateColors(values.length);
-
-  this.donutData = {
-    labels,
-    datasets: [{
-      data: values,
-      backgroundColor: colors,
-      hoverOffset: 4
-    }]
-  };
-
-  this.donutOptions = {
-    responsive: true,
-    
-    maintainAspectRatio: false,
-    animation: {
-      duration: 0 
-    },
-    cutout: '10%',
-    plugins: {
-      datalabels: {
-        color: '#000000',
-        display: (ctx:any) => ctx.dataset.data[ctx.dataIndex] > minValueToDisplay,
-        formatter: (v) => v.toLocaleString('es-PE', { maximumFractionDigits: 3 }),
-        font: {
-          weight: 'bold',
-          size: 0
+      },
+      plugins: {
+        legend: {
+          display: false
         },
-        textShadowColor: 'rgba(255,255,255,0.8)',
-        textShadowBlur: 4
-      },
-      legend: {
-        position: 'bottom',
-        labels: {
-          boxWidth: 14,
-          padding: 16,
-          font: { size: 12 }
+        tooltip: {
+          callbacks: {
+            label: (ctx: any) =>
+              `${ctx.label}: ${ctx.raw}`
+          }
+        },
+        datalabels: {
+          anchor: 'end', // 🔸 ubicar el texto al final de la barra
+          align: 'right',
+          color: '#000',
+          font: {
+            size: 11,
+          },
+          textStrokeColor: '#fff',
+          textStrokeWidth: 1
         }
       },
-      tooltip: {
-        callbacks: {
-          label: ctx => `${ctx.label}: ${Number(ctx.raw).toLocaleString('es-PE')}`
+      scales: {
+
+
+      }
+    };
+
+    this.setearCanvasBar()
+  }
+
+
+  onTabChange(event: any) { 
+    if (this.graficoResiduosDona && event == 2) {
+      this.setearCanvasBar()
+    }
+  }
+
+  setearCanvasBar() {
+    const baseHeightPerBar = 20;
+    const chartHeight = this.graficoResiduosDona.length * baseHeightPerBar;
+    setTimeout(() => {
+      const pchartElement = document.getElementById('chartBarras');
+      if (pchartElement) {
+        const canvas = pchartElement.querySelector('canvas');
+        if (canvas) {
+          canvas.style.height = `${chartHeight}px`;
+          canvas.style.width = '100%';
         }
       }
-    }
-  };
-}
+    }, 50);
+  }
+
+
+  private buildChartDona(data: any[]) {
+    const minValueToDisplay = 1; // Valor mínimo para mostrar individualmente
+    const documentStyle = getComputedStyle(document.documentElement);
+
+    const filtered = data.filter(r => parseFloat(r.totalAnio) > 0);
+
+    // Separar valores relevantes y otros
+    const aboveThreshold = filtered.filter(r => parseFloat(r.totalAnio) > minValueToDisplay);
+    const belowThreshold = filtered.filter(r => parseFloat(r.totalAnio) <= minValueToDisplay);
+
+    const otherTotal = belowThreshold.reduce((sum, r) => sum + parseFloat(r.totalAnio), 0);
+
+    const labels = [...aboveThreshold.map(r => r.descResiduo), ...(otherTotal > 0 ? ['Otros'] : [])];
+    const values = [...aboveThreshold.map(r => parseFloat(r.totalAnio)), ...(otherTotal > 0 ? [otherTotal] : [])];
+
+    const colors = this.generateColors(values.length);
+
+    this.donutData = {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        hoverOffset: 4
+      }]
+    };
+
+    this.donutOptions = {
+      responsive: true,
+
+      maintainAspectRatio: false,
+      animation: {
+        duration: 0
+      },
+      cutout: '10%',
+      plugins: {
+        datalabels: {
+          color: '#000000',
+          display: (ctx: any) => ctx.dataset.data[ctx.dataIndex] > minValueToDisplay,
+          formatter: (v) => v.toLocaleString('es-PE', { maximumFractionDigits: 3 }),
+          font: {
+            weight: 'bold',
+            size: 0
+          },
+          textShadowColor: 'rgba(255,255,255,0.8)',
+          textShadowBlur: 4
+        },
+        legend: {
+          position: 'bottom',
+          labels: {
+            boxWidth: 14,
+            padding: 16,
+            font: { size: 12 }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.label}: ${Number(ctx.raw).toLocaleString('es-PE')}`
+          }
+        }
+      }
+    };
+  }
 
 
 
@@ -481,7 +510,7 @@ export class DashboardComponent {
       )
       .subscribe(({ anios, residuos, empresas }) => {
         this.anios = anios.codigo === 0 ? anios.respuesta : [];
-       // this.localesFiltro = locales.codigo === 0 ? locales.respuesta : [];
+        // this.localesFiltro = locales.codigo === 0 ? locales.respuesta : [];
         this.residuos = residuos.codigo === 0 ? residuos.respuesta : [];
         this.empresas = empresas.codigo === 0 ? empresas.respuesta : [];
       });

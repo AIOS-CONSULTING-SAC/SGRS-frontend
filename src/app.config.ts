@@ -10,20 +10,27 @@ import { CustomHttpInterceptor } from './app/auth/http-interceptor';
 import { adaptLegacyInterceptor } from './app/auth/interceptor-adapter';
 
 export const appConfig: ApplicationConfig = {
-    providers: [
-      provideRouter(
-        appRoutes,
-        withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
-        withEnabledBlockingInitialNavigation()
-      ),
-      provideHttpClient(withInterceptors([
-        adaptLegacyInterceptor(CustomHttpInterceptor)
-      ])),
-      provideAnimationsAsync(),
-      providePrimeNG({
-        theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } }
-      }),
-      MessageService
-    ]
-  };
-  
+  providers: [
+    provideRouter(
+      appRoutes,
+      withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
+      withEnabledBlockingInitialNavigation()
+    ),
+    provideHttpClient(withInterceptors([
+      adaptLegacyInterceptor(CustomHttpInterceptor)
+    ])),
+    provideAnimationsAsync(),
+    providePrimeNG({
+      theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } },
+      translation:
+      {
+        emptyMessage: 'No hay resultados',
+        emptyFilterMessage: 'No se encontraron coincidencias',
+        choose: 'Elegir',
+        searchMessage: 'Escriba para buscar',
+        clear: 'Limpiar',
+      }
+    }),
+    MessageService
+  ]
+};

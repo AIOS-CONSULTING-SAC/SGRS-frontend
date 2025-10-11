@@ -36,7 +36,7 @@
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Local</label>
                 <p-multi-select [options]="localesFiltro" formControlName="local" optionValue="local"
-                    optionLabel="nombre" class="w-full" placeholder="Seleccione local" />
+                    optionLabel="nombre" class="w-full" placeholder="Seleccione local"  selectedItemsLabel="{0} seleccionados" />
                 <!-- <small *ngIf="formHelper.esCampoInvalido('local')" class="p-error">
                     {{ formHelper.obtenerMensajeErrorDefecto() }}
                 </small> -->
@@ -163,7 +163,7 @@
                 <label class="block text-sm font-medium text-slate-700 mb-1">Local <small
                         class="p-error">*</small></label>
                 <p-multi-select [options]="localesFiltro" formControlName="local" optionValue="local"
-                    optionLabel="nombre" class="w-full" placeholder="Seleccione local"
+                    optionLabel="nombre" class="w-full" placeholder="Seleccione local"  selectedItemsLabel="{0} seleccionados"
                     [class]="formHelper.esClaseInvalido('local')" />
                 <small *ngIf="formHelper.esCampoInvalido('local')" class="p-error">
                     {{ formHelper.obtenerMensajeErrorDefecto() }}

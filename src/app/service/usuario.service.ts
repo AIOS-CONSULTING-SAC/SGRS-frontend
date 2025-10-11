@@ -15,6 +15,7 @@ export class UsuarioService {
   listar(params: {
     tipoUser?: number;
     perfil?: number;
+    cliente?: number;
     nroDocumento?: string;
     nombre?: string;
     idEstado?: number;
@@ -22,6 +23,7 @@ export class UsuarioService {
     let queryParams = [];
     if (params.tipoUser != null) queryParams.push(`tipoUser=${params.tipoUser}`);
     if (params.perfil != null) queryParams.push(`perfil=${params.perfil}`);
+    if (params.cliente != null) queryParams.push(`cliente=${params.cliente}`);
     if (params.nroDocumento != null) queryParams.push(`nroDocumento=${params.nroDocumento}`);
     if (params.nombre != null) queryParams.push(`nombre=${params.nombre}`);
     if (params.idEstado != null) queryParams.push(`idEstado=${params.idEstado}`);

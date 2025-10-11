@@ -25,8 +25,8 @@ import { ClienteService } from '../../service/cliente.service';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
-import { LoadingComponent } from '../../shared/loading/loading.component';
-
+import { LoadingComponent } from '../../shared/loading/loading.component'; 
+Chart.register(ChartDataLabels);
 
 export interface FiltroResiduos {
   anio: number;
@@ -46,7 +46,7 @@ export interface ResumenResiduos {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ReactiveFormsModule, FormsModule, DropdownModule,TabsModule,
+  imports: [ReactiveFormsModule, FormsModule, DropdownModule, TabsModule,
     ButtonModule, CommonModule, ChartModule, LoadingComponent,
     MultiSelectModule, ProgressBarModule, CardModule, PanelModule],
   templateUrl: './dashboard.component.html',
@@ -74,6 +74,8 @@ export class DashboardComponent {
   chartStackedOptions = {};
   donutData!: ChartData<'doughnut'>;
   donutOptions!: ChartConfiguration<'doughnut'>['options'];
+  barData!: any;
+  barOptions!: any;
   constructor(private fb: FormBuilder, private localService: LocalService,
     private residuosService: ResiduoService,
     private autenticacionService: AutenticacionService,
@@ -141,7 +143,7 @@ export class DashboardComponent {
 
   listarGraficoVertical() {
     this.dashboardService.listarGraficoVertical(
-       this.obtenerCodCliente(),
+      this.obtenerCodCliente(),
       this.idAnio || 0,
       this.idLocales ?? this.localesFiltro.map(r => r.local).join(','),
       this.idMeses ?? this.meses.map(r => r.value).join(','),
@@ -154,8 +156,9 @@ export class DashboardComponent {
       finalize(() => (this.loading = false))
     )
       .subscribe((res: any) => {
-         this.graficoResiduosDona = res.codigo === 0 ? res.respuesta : [];
-         this.buildChartDona(this.graficoResiduosDona)
+        this.graficoResiduosDona = res.codigo === 0 ? res.respuesta : [];
+        this.buildChartDona(this.graficoResiduosDona)
+        this.buildChartBarras(this.graficoResiduosDona)
       });
   }
 
@@ -226,61 +229,126 @@ export class DashboardComponent {
     }
   }
 
-  private buildChartDona(data: any[]) {
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
-    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-    const filtered = data.filter(r => r.totalAnio > 0);
-    //Preparar labels y valores
-    const labels = filtered.map(r => r.descResiduo);
-    const values = filtered.map(r => r.totalAnio);
+ private buildChartBarras(data: any[]) {
+  const documentStyle = getComputedStyle(document.documentElement);
+  const textColor = documentStyle.getPropertyValue('--text-color');
 
-    //Generar colores dinámicos
-    const colors = this.generateColors(values.length);
+  const filtered = data.filter(r => parseFloat(r.totalAnio) > 0);
 
-    this.donutData = {
-      labels,
-      datasets: [
-        {
-          data: values,
-          backgroundColor: colors,
-          hoverOffset: 4
-        }
-      ]
-    };
+  const labels = filtered.map(r => r.descResiduo);
+  const values = filtered.map(r => parseFloat(r.totalAnio));
+  const colors = this.generateColors(values.length);
 
-    this.donutOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '60%',
-      plugins: {
-        datalabels: {
-          color: '#FFFFFF', 
-          clamp: true,
-          formatter: (v) => v.toLocaleString('es-PE', { maximumFractionDigits: 3 }),
-          font: {
-            weight: 'bold',
-            size: 12
-          }
-        },
-        legend: {
-          position: 'bottom',
-          labels: {
-            boxWidth: 14,
-            padding: 16,
-            font: { size: 12 }
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx =>
-              `${ctx.label}: ${Number(ctx.raw).toLocaleString()}`
-          }
+  this.barData = {
+    labels,
+    datasets: [
+      {
+        label: 'Cantidad por Residuo',
+        data: values,
+        backgroundColor: colors
+      }
+    ]
+  };
+
+  this.barOptions = {
+    indexAxis: 'y', // Barras horizontales
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx:any) => `${ctx.label}: ${Number(ctx.raw).toLocaleString('es-PE')}`
         }
       }
-    };
-  }
+    },
+    scales: {
+      x: {
+        ticks: { color: textColor },
+        title: {
+          display: true,
+          text: 'Cantidad',
+          color: textColor
+        }
+      },
+      y: {
+        ticks: { color: textColor },
+        title: {
+          display: true,
+          text: 'Tipo de Residuo',
+          color: textColor
+        }
+      }
+    }
+  };
+}
+
+
+
+ private buildChartDona(data: any[]) {
+  const minValueToDisplay = 1; // Valor mínimo para mostrar individualmente
+  const documentStyle = getComputedStyle(document.documentElement);
+
+  const filtered = data.filter(r => parseFloat(r.totalAnio) > 0);
+
+  // Separar valores relevantes y otros
+  const aboveThreshold = filtered.filter(r => parseFloat(r.totalAnio) > minValueToDisplay);
+  const belowThreshold = filtered.filter(r => parseFloat(r.totalAnio) <= minValueToDisplay);
+
+  const otherTotal = belowThreshold.reduce((sum, r) => sum + parseFloat(r.totalAnio), 0);
+
+  const labels = [...aboveThreshold.map(r => r.descResiduo), ...(otherTotal > 0 ? ['Otros'] : [])];
+  const values = [...aboveThreshold.map(r => parseFloat(r.totalAnio)), ...(otherTotal > 0 ? [otherTotal] : [])];
+
+  const colors = this.generateColors(values.length);
+
+  this.donutData = {
+    labels,
+    datasets: [{
+      data: values,
+      backgroundColor: colors,
+      hoverOffset: 4
+    }]
+  };
+
+  this.donutOptions = {
+    responsive: true,
+    
+    maintainAspectRatio: false,
+    animation: {
+      duration: 0 
+    },
+    cutout: '10%',
+    plugins: {
+      datalabels: {
+        color: '#000000',
+        display: (ctx:any) => ctx.dataset.data[ctx.dataIndex] > minValueToDisplay,
+        formatter: (v) => v.toLocaleString('es-PE', { maximumFractionDigits: 3 }),
+        font: {
+          weight: 'bold',
+          size: 0
+        },
+        textShadowColor: 'rgba(255,255,255,0.8)',
+        textShadowBlur: 4
+      },
+      legend: {
+        position: 'bottom',
+        labels: {
+          boxWidth: 14,
+          padding: 16,
+          font: { size: 12 }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: ctx => `${ctx.label}: ${Number(ctx.raw).toLocaleString('es-PE')}`
+        }
+      }
+    }
+  };
+}
+
+
 
   private generateColors(count: number): string[] {
     const colors: string[] = [];
@@ -419,7 +487,7 @@ export class DashboardComponent {
       });
   }
   limpiar() {
-    this.idAnio =  null;
+    this.idAnio = null;
     this.idMeses = null;
     this.idLocales = null;
     this.idResiduos = null
@@ -428,18 +496,18 @@ export class DashboardComponent {
     this.graficoResiduos = []
     this.chartOptions.labels = [];
     this.chartOptions.datasets[0].data = [];
-   
+
 
   }
 
   buscar() {
-    if(this.obtenerCodCliente() == null || this.obtenerCodCliente() == 0){
-      this.mensajeService.advertencia('Validación','Debe seleccionar una empresa.')
+    if (this.obtenerCodCliente() == null || this.obtenerCodCliente() == 0) {
+      this.mensajeService.advertencia('Validación', 'Debe seleccionar una empresa.')
       return
     }
 
-    if(this.idAnio == null){
-      this.mensajeService.advertencia('Validación','Debe especificar año.')
+    if (this.idAnio == null) {
+      this.mensajeService.advertencia('Validación', 'Debe especificar año.')
       return
     }
     this.listarGraficoBarra()

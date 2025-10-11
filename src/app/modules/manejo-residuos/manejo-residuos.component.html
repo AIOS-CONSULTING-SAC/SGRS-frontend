@@ -3,7 +3,7 @@
 
     <div class="flex justify-end md:hidden mb-4">
         <button pButton icon="pi pi-filter" label="Filtros" class="m-1 sm:w-150 text-gray-700"
-        [style]="{'min-width': '130px'}"  [severity]="'contrast'" (click)="mostrarFiltros = true"></button>
+            [style]="{'min-width': '130px'}" [severity]="'contrast'" (click)="mostrarFiltros = true"></button>
         <button pButton [label]="modoEdicion ?'Cancelar' : 'Editar'" class="m-1 sm:w-150 text-gray-700"
             [style]="{'min-width': '130px'}" [icon]="'pi' + (modoEdicion ? ' pi-times' : ' pi-pencil')"
             *ngIf="residuosPorLocal.length>0" [severity]="modoEdicion ? 'danger' : 'contrast'" [raised]="true"
@@ -36,7 +36,7 @@
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Local</label>
                 <p-multi-select [options]="localesFiltro" formControlName="local" optionValue="local"
-                    optionLabel="nombre" class="w-full" placeholder="Seleccione local"  />
+                    optionLabel="nombre" class="w-full" placeholder="Seleccione local" />
                 <!-- <small *ngIf="formHelper.esCampoInvalido('local')" class="p-error">
                     {{ formHelper.obtenerMensajeErrorDefecto() }}
                 </small> -->
@@ -60,11 +60,11 @@
     </form>
     <p-table #table [value]="residuosPorLocal" class="tabla-locales" [size]="'small'" dataKey="codLocal"
         [expandedRowKeys]="expandedRows" [paginator]="true" [rows]="15" [rowsPerPageOptions]="[5,10,20]"
-        [responsiveLayout]="'stack'" >
+        [responsiveLayout]="'stack'" filter>
         <ng-template pTemplate="header">
             <tr>
                 <th style="width: 3rem"></th>
-                <th>Local</th> 
+                <th>Local</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-local let-expanded="expanded">
@@ -84,46 +84,55 @@
                 <td colspan="7">
                     <div class="p-3">
                         <p-table [value]="local.residuos" class="tabla-residuos" [size]="'small'" dataKey="codResiduo"
-                            [scrollable]="true" [responsiveLayout]="'stack'"  [paginator]="true" [rows]="15" [rowsPerPageOptions]="[5,10,20]">
-                            <ng-template pTemplate="header">
-            <tr>
-                <th pFrozenColumn>Descripción</th>
-                <th>Total</th> 
-                <th *ngFor="let mes of meses">{{ mes }}</th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-residuo let-rowIndex="rowIndex">
-            <tr>
-                <td pFrozenColumn>
-                    <span class="p-column-title">Descripción</span>
-                    {{ residuo.descResiduo + ' ('+residuo.descUnidad +')' }}</td>
-                <td>
-                    <span class="p-column-title">Total</span>
-                    {{ residuo.total }}
-                </td> 
-                <td *ngFor="let mes of meses; let i = index">
-                    <ng-container *ngIf="modoEdicion; else lectura">
-                        <span class="p-column-title">{{ mes }}</span>
-                        <input #inputMes pInputText [attr.data-local]="local.codLocal" [attr.data-row]="rowIndex"
-                            [attr.data-col]="i" (keydown)="navegarConFlechas($event, local.codLocal)"
-                            (input)="validar3Decimales($event, residuo, i + 1)"
-                            [(ngModel)]="residuo['mes' + (i + 1).toString().padStart(2, '0')]"
-                            class="p-inputtext p-inputtext-sm" style="width: 70px; text-align: center" />
-                    </ng-container>
-                    <ng-template #lectura>
-                        <span class="p-column-title">{{ mes }}</span>
-                        {{ residuo['mes' + (i + 1).toString().padStart(2, '0')] }}
-                    </ng-template>
+                            [scrollable]="true" [responsiveLayout]="'stack'" [paginator]="true" [rows]="10"
+                              dataKey="codResiduo"
+                            [rowsPerPageOptions]="[5,10,20]">
+                            <ng-template #header>
+                                <tr>
+                                    <th>Descripción</th>
+                                    <th>Total</th>
+                                    <th *ngFor="let mes of meses">{{ mes }}</th>
+                                </tr>
+                                 <tr>
+                                    <th>
+                                        <p-columnFilter type="text" field="descResiduo" placeholder="Filtrar residuo" ariaLabel="Filtrar residuo"></p-columnFilter>
+                                    </th>
+                                    <th></th>
+                                    <th *ngFor="let mes of meses"></th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-residuo let-rowIndex="rowIndex">
+                                <tr>
+                                    <td>
+                                        <span class="p-column-title">Descripción</span>
+                                        {{ residuo.descResiduo + ' ('+residuo.descUnidad +')' }}
+                                    </td>
+                                    <td>
+                                        <span class="p-column-title">Total</span>
+                                        {{ residuo.total }}
+                                    </td>
+                                    <td *ngFor="let mes of meses; let i = index">
+                                        <ng-container *ngIf="modoEdicion; else lectura">
+                                            <span class="p-column-title">{{ mes }}</span>
+                                            <input #inputMes pInputText [attr.data-local]="local.codLocal" [attr.data-row]="rowIndex"
+                                                [attr.data-col]="i" (keydown)="navegarConFlechas($event, local.codLocal)"
+                                                (input)="validar3Decimales($event, residuo, i + 1)"
+                                                [(ngModel)]="residuo['mes' + (i + 1).toString().padStart(2, '0')]"
+                                                class="p-inputtext p-inputtext-sm" style="width: 70px; text-align: center" />
+                                        </ng-container>
+                                        <ng-template #lectura>
+                                            <span class="p-column-title">{{ mes }}</span>
+                                            {{ residuo['mes' + (i + 1).toString().padStart(2, '0')] }}
+                                        </ng-template>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
                 </td>
-            </tr>
+            </tr>   
         </ng-template>
     </p-table>
-</div>
-</td>
-</tr>
-
-</ng-template>
-</p-table>
 </div>
 
 <p-sidebar [(visible)]="mostrarFiltros" position="left" [dismissible]="false" styleClass="filtros-sidebar">

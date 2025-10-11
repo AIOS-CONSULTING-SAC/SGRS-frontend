@@ -52,8 +52,8 @@
                 TOTAL DE RESIDUOS POR PTAR
             </p-tab>
 
-            <p-tab value="1" class="flex items-center !gap-2" >
-              TIPOS DE RESIDUOS SOLIDOS
+            <p-tab value="1" class="flex items-center !gap-2">
+                TIPOS DE RESIDUOS SOLIDOS
             </p-tab>
             <ng-template #nexticon>
                 <i class="pi pi-plus"></i>
@@ -106,12 +106,16 @@
                 </div>
             </p-tabpanel>
             <p-tabpanel value="1">
-                  <div class="grid p-3">
+                <div class="grid p-3">
                     <!-- <p-chart *ngIf="chartData" type="bar" [data]="chartData" [options]="chartOptions"
                     styleClass="w-full h-[400px]">
                 </p-chart> -->
-                    <p-chart *ngIf="graficoResiduosDona?.length" type="doughnut" [data]="donutData" [options]="donutOptions"
-                        styleClass="w-full h-30rem">
+                    <p-chart *ngIf="graficoResiduosDona?.length" type="doughnut" [data]="donutData"
+                        [options]="donutOptions"  styleClass="w-full h-[800px]">
+                    </p-chart>
+
+                    <p-chart *ngIf="graficoResiduosDona?.length" type="bar" [data]="barData" [options]="barOptions"
+                        styleClass="w-full h-[600px]" style="height: 600px;">
                     </p-chart>
                 </div>
             </p-tabpanel>

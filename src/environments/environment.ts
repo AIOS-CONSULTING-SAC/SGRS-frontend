@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  version: 'v1.0.0beta4',
+  version: 'v1.0.5',
   apiRest: {
     host: 'http://localhost:3000'
   }

@@ -400,7 +400,7 @@ export class DashboardComponent {
         PARAMETROS.MANTENIMIENTO.OPCIONES.EMPRESAS,
         PARAMETROS.MANTENIMIENTO.EMPRESAS.ANIOS
       ),
-      locales: this.localService.listado(this.obtenerCodCliente(), '', 1),
+      //locales: this.localService.listado(this.obtenerCodCliente(), '', 1),
       residuos: this.residuosService.listado(this.obtenerCodCliente(), '', 1),
       empresas: this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, "", "", 1),
     })
@@ -411,9 +411,9 @@ export class DashboardComponent {
         }),
         finalize(() => this.loading = false)
       )
-      .subscribe(({ anios, locales, residuos, empresas }) => {
+      .subscribe(({ anios, residuos, empresas }) => {
         this.anios = anios.codigo === 0 ? anios.respuesta : [];
-        this.localesFiltro = locales.codigo === 0 ? locales.respuesta : [];
+       // this.localesFiltro = locales.codigo === 0 ? locales.respuesta : [];
         this.residuos = residuos.codigo === 0 ? residuos.respuesta : [];
         this.empresas = empresas.codigo === 0 ? empresas.respuesta : [];
       });

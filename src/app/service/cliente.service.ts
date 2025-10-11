@@ -14,7 +14,7 @@ export class ClienteService {
   constructor(private http: HttpService) { 
   }
 
-  listado(idEmpresa?: number | null, ruc?: string, razonSocial?: string, idEstado?: number | null): Observable<ApiResponse<ClienteResponse[]>> {
+  listado(idEmpresa?: number | null, ruc?: string | null, razonSocial?: string | null, idEstado?: number | null): Observable<ApiResponse<ClienteResponse[]>> {
     let url =apiServicio + `listar?`
     if (idEmpresa) url += `idEmpresa=${idEmpresa}`
     if (ruc) url += `&ruc=${ruc}`

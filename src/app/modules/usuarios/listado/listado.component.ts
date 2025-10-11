@@ -56,7 +56,7 @@ export class ListadoComponent {
   }
 
   private obtenerClientes() {
-    return this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa).pipe(
+    return this.clienteService.listado(this.autenticacionService.getDatosToken()?.codigoEmpresa, null,null,1).pipe(
       catchError(error => {
         this.mensajeToast.errorServicioConsulta(error);
         return EMPTY;
@@ -123,6 +123,7 @@ export class ListadoComponent {
       .listar({
         tipoUser: this.idTipoUsuario ? +this.idTipoUsuario : undefined,
         perfil: this.idTipoPerfil ? +this.idTipoPerfil : undefined,
+        cliente: this.empresa ? + this.empresa : undefined,
         nroDocumento: this.ruc,
         nombre: this.nombres,
         idEstado: this.estado,
@@ -150,7 +151,7 @@ export class ListadoComponent {
     this.idTipoPerfil = '';
     this.ruc = '';
     this.nombres = ''
-    this.estado = 'Activo';
+    this.estado = '1';
     this.usuarios = []
   }
 
